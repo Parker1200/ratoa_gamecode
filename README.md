@@ -46,6 +46,7 @@ https://github.com/monoknot/loaded-q3a
 
 Some very useful information:
 http://old.mrhide.fr/q3coding/Offhand%20Grappling%20Hook.htm
+http://old.mrhide.fr/code3arena/tutorial40.htm
 
 
 To enable on the server:
@@ -62,7 +63,7 @@ On the client side, type in the console:
 `\bind f +button5`
 You can replace `f` with any other key.
 
-There shouldn't be any conflict with g_grapple. However, you cannot use your offhand grappling hook with the regular hook selected. The offhand grapple can be used immediately during the ongoing game right after being enabled. There's no need to be respawned.
+There shouldn't be any conflict with g_grapple. The offhand grapple can be used immediately during the ongoing game right after being enabled. There's no need to be respawned.
 
 Cvars g_grappleSpeed and g_grapplePullSpeed should not affect the swinging hook. I have not tested the offhand grappling hook in this mode.
 
