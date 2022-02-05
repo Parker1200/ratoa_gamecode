@@ -41,12 +41,9 @@ It adds many new features and quality improvements, among them are:
 
 This fork introduces offhand grappling hook to Ratmod. It's mostly based on source code provided inside `zzzz-icity-r26.pk3`. To obtain the original source simply connect to "instaCITY" Open Arena server. Readme states that the license is GPL.
 
-I also took some inspiration from:
-https://github.com/monoknot/loaded-q3a
+I also took some inspiration from: https://github.com/monoknot/loaded-q3a
 
-Some very useful information:
-http://old.mrhide.fr/q3coding/Offhand%20Grappling%20Hook.htm
-http://old.mrhide.fr/code3arena/tutorial40.htm
+Some very useful information: [Willi's Q3A Offhand Grappling Hook v1.0](http://old.mrhide.fr/q3coding/Offhand%20Grappling%20Hook.htm) & [Advanced Grapple Hook by Kilderean](http://old.mrhide.fr/code3arena/tutorial40.htm)
 
 
 To enable on the server:
@@ -60,7 +57,7 @@ To change the pull speed value to the one used on instaCITY:
 
 
 On the client side, type in the console:
-`\bind f +button5`
+`\bind f +button14`
 You can replace `f` with any other key.
 
 There shouldn't be any conflict with g_grapple. The offhand grapple can be used immediately during the ongoing game right after being enabled. There's no need to be respawned.
