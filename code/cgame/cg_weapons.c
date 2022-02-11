@@ -1691,6 +1691,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 		// always shoot straight forward from our current position
 		AngleVectors( cg.predictedPlayerState.viewangles, forward, NULL, NULL );
 		VectorCopy( cg.predictedPlayerState.origin, muzzlePoint );
+		muzzlePoint[2] += cg.predictedPlayerState.viewheight;
 	}
 	else
 //unlagged - attack prediction #1
@@ -1730,15 +1731,24 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 //		VectorCopy(cg.refdef.vieworg, muzzlePoint );
 		// *this* is the correct origin for true lightning
 		VectorCopy(cg.predictedPlayerState.origin, muzzlePoint );
+		muzzlePoint[2] += cg.predictedPlayerState.viewheight;
 //unlagged - true lightning
 	} else {
 		// !CPMA
 		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
 		VectorCopy(cent->lerpOrigin, muzzlePoint );
+		if (cent->currentState.number == cg.predictedPlayerState.clientNum) {
+			muzzlePoint[2] += cg.predictedPlayerState.viewheight;
+		} else {
+			int anim;
+			anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
+			if ( anim == LEGS_WALKCR || anim == LEGS_IDLECR ) {
+				muzzlePoint[2] += CROUCH_VIEWHEIGHT;
+			} else {
+				muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
+			}
+		}
 	}
-
-	// FIXME: crouch
-	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
 
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
 
@@ -4162,9 +4172,13 @@ void CG_FireWeapon( centity_t *cent ) {
 		if (ent->eType != ET_PLAYER && ent->clientNum >= 0 && ent->clientNum < MAX_CLIENTS) {
 			centity_t *playerCEnt = &cg_entities[ent->clientNum];
 			if (!playerCEnt->currentValid || playerCEnt->pe.lightningFiring) {
+				// make sure the impact sounds still get played
+				CG_PredictWeaponEffects(cent);
 				return;
 			}
 		} else if ( cent->pe.lightningFiring ) {
+			// make sure the impact sounds still get played
+			CG_PredictWeaponEffects(cent);
 			return;
 		}
 	}
@@ -4639,6 +4653,10 @@ CG_MissileHitPlayer
 */
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum, 
 	       predictedMissileStatus_t *missileStatus) {
+	if (weapon == WP_LIGHTNING) {
+		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH, missileStatus );
+		return;
+	}
 // LEILEI ENHANCEMENT
 	if (cg_leiEnhancement.integer) {
 		CG_SmokePuff( origin, dir, 22, 1, 1, 1, 1.0f, 900, cg.time, 0, 0,  cgs.media.lbldShader1 );
