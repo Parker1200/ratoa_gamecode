@@ -1809,6 +1809,9 @@ void G_UpdateCvars( void ) {
                                     if( allowedVote("custom") )
                                         voteflags|=VF_custom;
 
+                                    if( allowedVote("trackconsent") )
+                                        voteflags|=VF_trackconsent;
+
                                     trap_Cvar_Set("voteflags",va("%i",voteflags));
                                 }
       
@@ -2099,6 +2102,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
             if( allowedVote("custom") )
                 voteflags|=VF_custom;
+
+            if( allowedVote("trackconsent") )
+                voteflags|=VF_trackconsent;
 
             trap_Cvar_Set("voteflags",va("%i",voteflags));
         }
