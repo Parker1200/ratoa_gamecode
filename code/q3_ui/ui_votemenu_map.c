@@ -438,6 +438,7 @@ void UI_VoteMapMenu_Update( void ) {
 	int 		top;
 	static	char	picname[MAX_MAPSPERPAGE][64];
 	char			mapname[MAX_MAPNAME_LENGTH];
+	char			picnameold[64];
 
 	top = s_votemenu_map.pagenum * MAX_MAPSPERPAGE;
 	//s_votemenu_map.nummaps = maplist.num_maps - s_votemenu_map.pagenumber * MAX_MAPSPERPAGE;
@@ -447,14 +448,21 @@ void UI_VoteMapMenu_Update( void ) {
 		if (top + i >= filtered_list.num_maps)
 			break;
 
+		if ( s_votemenu_map.mappics[i].generic.name ) {
+			// Q_strncpyz( picnameold, s_votemenu_map.mappics[i].generic.name, sizeof(picnameold) );
+			Com_sprintf( picnameold, sizeof(picnameold), s_votemenu_map.mappics[i].generic.name );
+		}
+
 		Q_strncpyz( mapname, filtered_list.mapname[top+i], MAX_MAPNAME_LENGTH );
 		Q_strupr( mapname );
 
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", mapname );
                 
 		s_votemenu_map.mappics[i].generic.flags &= ~((unsigned int)QMF_HIGHLIGHT);
-		s_votemenu_map.mappics[i].generic.name   = picname[i];
-		s_votemenu_map.mappics[i].shader         = 0;
+		if ( !s_votemenu_map.mappics[i].generic.name || Q_stricmp( picname[i], picnameold ) ) {
+			s_votemenu_map.mappics[i].generic.name   = picname[i];
+			s_votemenu_map.mappics[i].shader         = 0;
+		}
 
 		// reset
 		s_votemenu_map.mapbuttons[i].generic.flags |= QMF_PULSEIFFOCUS;
