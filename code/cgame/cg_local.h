@@ -1760,6 +1760,7 @@ extern  vmCvar_t		cg_pushNotifications;
 extern  vmCvar_t		cg_pushNotificationTime;
 
 extern vmCvar_t                	cg_ratInitialized;
+extern vmCvar_t                	cg_xratInitialized;
 
 extern vmCvar_t                	cg_predictTeleport;
 extern vmCvar_t                	cg_predictWeapons;

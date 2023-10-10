@@ -212,6 +212,7 @@ vmCvar_t 	cg_pushNotificationTime;
 vmCvar_t 	cg_trackConsent;
 
 vmCvar_t 	cg_ratInitialized;
+vmCvar_t 	cg_xratInitialized;
 
 vmCvar_t 	cg_predictTeleport;
 vmCvar_t 	cg_predictWeapons;
@@ -511,8 +512,8 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 	{ &cg_zoomFov, "cg_zoomfov", "30", CVAR_ARCHIVE },
 	{ &cg_zoomFovTmp, "cg_zoomfovTmp", "0", 0 },
-	{ &cg_fov, "cg_fov", "90", CVAR_ARCHIVE },
-	{ &cg_horplus, "cg_horplus", "1", CVAR_ARCHIVE },
+	{ &cg_fov, "cg_fov", "100", CVAR_ARCHIVE },
+	{ &cg_horplus, "cg_horplus", "0", CVAR_ARCHIVE },
 	{ &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_gibs, "cg_gibs", "1", CVAR_ARCHIVE  },
@@ -655,6 +656,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 
 	// RAT ===================
 	{ &cg_ratInitialized, "cg_ratInitialized", "0", CVAR_ARCHIVE},
+	{ &cg_xratInitialized, "cg_xratInitialized", "0", CVAR_ARCHIVE},
 
 	{ &cg_predictTeleport, "cg_predictTeleport", "1", CVAR_ARCHIVE},
 	{ &cg_predictWeapons, "cg_predictWeapons", "1", CVAR_ARCHIVE},
@@ -1046,6 +1048,21 @@ int CG_MigrateOldCrosshair(int old) {
  * Update really old ratmod configurations
  * This might be removed in the future
  */
+#define LATEST_XRATINITIALIZED 1
+void CG_XRatOldCfgUpdate(void) {
+	// x-ratmod
+	if (cg_xratInitialized.integer < 1) {
+		if (cg_horplus.integer) {
+			CG_Cvar_ResetToDefault("cg_horplus");
+			if (cg_fov.integer == 90) {
+				CG_Cvar_ResetToDefault("cg_fov");
+			}
+		}
+
+		CG_Cvar_SetAndUpdate( "cg_xratInitialized", "1" );
+	}
+}
+
 void CG_RatOldCfgUpdate(void) {
 	if (cg_ratInitialized.integer < 1) {
 		if (cg_drawCrosshair.integer < 10) {
@@ -1485,10 +1502,10 @@ void CG_RatOldCfgUpdate(void) {
 	}
 
 	if (cg_ratInitialized.integer < 37) {
-		if (cg_fov.integer == 90 || cg_fov.integer == 100) {
-			CG_Cvar_ResetToDefault("cg_horplus");
-			CG_Cvar_ResetToDefault("cg_fov");
-		}
+		// if (cg_fov.integer == 90 || cg_fov.integer == 100) {
+		// 	CG_Cvar_ResetToDefault("cg_horplus");
+		// 	CG_Cvar_ResetToDefault("cg_fov");
+		// }
 
 		CG_Cvar_SetAndUpdate( "cg_ratInitialized", "37" );
 	}
@@ -1498,12 +1515,18 @@ void CG_RatOldCfgUpdate(void) {
  * Make sure defaults are up to date
  */
 void CG_RatInitDefaults(void)  {
-	if (cg_ratInitialized.integer == 0) {
+	if (cg_ratInitialized.integer == 0 && cg_xratInitialized.integer == 0) {
 		CG_SetEngineCvars();
 		CG_CvarResetDefaults();
 		CG_Cvar_SetAndUpdate( "cg_ratInitialized", va("%i", LATEST_RATINITIALIZED) );
-	} else if (cg_ratInitialized.integer < LATEST_RATINITIALIZED) {
-		CG_RatOldCfgUpdate();
+		CG_Cvar_SetAndUpdate( "cg_xratInitialized", va("%i", LATEST_XRATINITIALIZED) );
+	} else {
+		if (cg_ratInitialized.integer < LATEST_RATINITIALIZED) {
+			CG_RatOldCfgUpdate();
+		}
+		if (cg_xratInitialized.integer < LATEST_XRATINITIALIZED) {
+			CG_XRatOldCfgUpdate();
+		}
 	}
 }
 
@@ -1558,8 +1581,8 @@ void CG_Cvar_PrintUserChanges( qboolean all ) {
 				// exclude non-cg cvars that might be in the table
 				continue;
 			}
-			if (Q_stricmp(cv->cvarName, "cg_ratInitialized") == 0) {
-				// exclude cg_ratInitialized because users should never
+			if ( (Q_stricmp(cv->cvarName, "cg_ratInitialized") == 0) || (Q_stricmp(cv->cvarName, "cg_xratInitialized") == 0) ) {
+				// exclude cg_ratInitialized and cg_xratInitialized because users should never
 				// write that into their manual config files
 				continue;
 			}
