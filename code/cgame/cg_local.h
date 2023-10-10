@@ -1894,6 +1894,10 @@ extern vmCvar_t			cg_enemyCorpseValue;
 extern vmCvar_t			cg_teamCorpseSaturation;
 extern vmCvar_t			cg_teamCorpseValue;
 
+extern vmCvar_t			cg_variedModelColors;
+extern vmCvar_t			cg_variedModelSaturation;
+extern vmCvar_t			cg_variedModelValue;
+
 extern vmCvar_t			cg_itemFade;
 extern vmCvar_t			cg_itemFadeTime;
 

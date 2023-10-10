@@ -2978,6 +2978,13 @@ void CG_PlayerColorFromString(char *str, float *h, float *s, float *v) {
 
 }
 
+static void CG_PlayerAutoColor(clientInfo_t *ci, float outColor[4]) {
+	int idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
+	outColor[0] = head_auto_colors[idx][0];
+	outColor[1] = head_auto_colors[idx][1];
+	outColor[2] = head_auto_colors[idx][2];
+}
+
 #define RGBA_SIZE (4*sizeof(byte))
 void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *outColor) {
 	clientInfo_t *player = &cgs.clientinfo[cg.clientNum];
@@ -2998,11 +3005,26 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 
 	if ((!(ci->forcedBrightModel)
 			&& ((cg_brightShells.integer || cg_brightOutline.integer ) && cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE))
-		       ) && (cgs.gametype == GT_FFA && !(cgs.ratFlags & RAT_ALLOWFORCEDMODELS))) {
+		       ) && (cgs.gametype == GT_FFA && ( !(cgs.ratFlags & RAT_ALLOWFORCEDMODELS) || (cg_variedModelColors.integer && (cgs.ratFlags & RAT_ALLOWFORCEDMODELS)) ) )) {
 		float color[4];
-		color[0] = ci->color2[0];
-		color[1] = ci->color2[1];
-		color[2] = ci->color2[2];
+		if ( cg_variedModelColors.integer && (cgs.ratFlags & RAT_ALLOWFORCEDMODELS) ) {
+			float h,s,v;
+			if (cg_variedModelColors.integer == 2) {
+				CG_PlayerAutoColor(ci, color);
+			}
+			else {
+				color[0] = ci->color2[0];
+				color[1] = ci->color2[1];
+				color[2] = ci->color2[2];
+			}
+			Q_RGB2HSV(color, &h, &s, &v);
+			Q_HSV2RGB(h, cg_variedModelSaturation.value, cg_variedModelValue.value, color);
+		}
+		else {
+			color[0] = ci->color2[0];
+			color[1] = ci->color2[1];
+			color[2] = ci->color2[2];
+		}
 		if (isDead) {
 			color[0] *= 0.3;
 			color[1] *= 0.3;

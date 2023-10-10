@@ -343,6 +343,10 @@ vmCvar_t	cg_enemyCorpseValue;
 vmCvar_t	cg_teamCorpseSaturation;
 vmCvar_t	cg_teamCorpseValue;
 
+vmCvar_t	cg_variedModelColors;
+vmCvar_t	cg_variedModelSaturation;
+vmCvar_t	cg_variedModelValue;
+
 vmCvar_t	cg_itemFade;
 vmCvar_t	cg_itemFadeTime;
 
@@ -797,6 +801,10 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_enemyCorpseValue ,          "cg_enemyCorpseValue", "0.2", CVAR_ARCHIVE},
 	{ &cg_teamCorpseSaturation ,      "cg_teamCorpseSaturation", "", CVAR_ARCHIVE},
 	{ &cg_teamCorpseValue ,           "cg_teamCorpseValue", "0.2", CVAR_ARCHIVE},
+
+	{ &cg_variedModelColors ,          "cg_variedModelColors", "0", CVAR_ARCHIVE},
+	{ &cg_variedModelSaturation , "cg_variedModelSaturation", "0.8", CVAR_ARCHIVE},
+	{ &cg_variedModelValue , "cg_variedModelValue", "1", CVAR_ARCHIVE},
 
 	{ &cg_itemFade ,           "cg_itemFade", "1", CVAR_ARCHIVE},
 	{ &cg_itemFadeTime ,           "cg_itemFadeTime", "3000", CVAR_CHEAT},
@@ -1739,7 +1747,10 @@ void CG_UpdateCvars( void ) {
 		+ cg_enemyCorpseSaturation.modificationCount
 		+ cg_enemyCorpseValue.modificationCount
 		+ cg_teamCorpseSaturation.modificationCount
-		+ cg_teamCorpseValue.modificationCount;
+		+ cg_teamCorpseValue.modificationCount
+		+ cg_variedModelColors.modificationCount
+		+ cg_variedModelSaturation.modificationCount
+		+ cg_variedModelValue.modificationCount;
 	if ( forceColorModificationCounts != i) {
 		CG_ParseForcedColors();
 		forceColorModificationCounts = i;
