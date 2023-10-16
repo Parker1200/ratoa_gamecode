@@ -945,6 +945,9 @@ void CG_ResetStatusbar(void) {
 #define	RSB4_BIGCHAR_HEIGHT		28
 #define	RSB5_BIGCHAR_HEIGHT		20
 
+#define	RSB4_SMALLCHAR_HEIGHT	21
+#define	RSB5_SMALLCHAR_HEIGHT	15
+
 #define	RSB4_BIGICON_HEIGHT		27
 
 #define	RSB4_WEAPICON_HEIGHT		16
@@ -1482,9 +1485,9 @@ static void CG_DrawRatStatusBar4( void ) {
 	}
 
 	if (vflipped) {
-		bigchar_height = RSB5_BIGCHAR_HEIGHT;
+		bigchar_height = cg_ratStatusbarSmallFont.integer ? RSB5_SMALLCHAR_HEIGHT : RSB5_BIGCHAR_HEIGHT;
 	} else { 
-		bigchar_height = RSB4_BIGCHAR_HEIGHT;
+		bigchar_height = cg_ratStatusbarSmallFont.integer ? RSB4_SMALLCHAR_HEIGHT : RSB4_BIGCHAR_HEIGHT;
 	}
 	bigchar_width = CG_HeightToWidth(bigchar_height);
 
