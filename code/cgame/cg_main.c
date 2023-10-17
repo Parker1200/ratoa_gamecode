@@ -1528,9 +1528,9 @@ void CG_RatOldCfgUpdate(void) {
 		CG_Cvar_SetAndUpdate( "cg_ratInitialized", "37" );
 	}
 	if (cg_ratInitialized.integer < 38) {
-		if (cg_horplus.integer && cg_fov.integer == 90) {
-			CG_Cvar_ResetToDefault("cg_fov");
-		}
+		// if (cg_horplus.integer && cg_fov.integer == 90) {
+		// 	CG_Cvar_ResetToDefault("cg_fov");
+		// }
 
 		CG_Cvar_SetAndUpdate( "cg_ratInitialized", "38" );
 	}
