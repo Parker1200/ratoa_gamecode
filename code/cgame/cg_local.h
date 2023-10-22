@@ -2227,7 +2227,7 @@ int CG_GetScoresMtrn(int scoreNum);
 // cg_player.c
 //
 void CG_Player( centity_t *cent );
-void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *outColor);
+void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *outColor, int clientNum);
 void CG_ResetPlayerEntity( centity_t *cent );
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team, qboolean isMissile,
 	       	clientInfo_t *ci, int orderIndicator, qboolean useBlendBrightshell );

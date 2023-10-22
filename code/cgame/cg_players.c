@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
 
-#define MAX_AUTOHEADCOLORS 32
+#define MAX_AUTOHEADCOLORS 32 // cannot be greater than 64 (MAX_CLIENTS)
 static byte head_auto_colors[MAX_AUTOHEADCOLORS][3] = {
 	{ 0xFF, 0x00, 0x00 },
 	// { 0x00, 0x00, 0xFF },
@@ -60,6 +60,8 @@ static byte head_auto_colors[MAX_AUTOHEADCOLORS][3] = {
 	{ 0xEE, 0x82, 0xEE },
 	{ 0x00, 0x00, 0xFF } // formerly second color
 };
+
+static float varied_model_colors[MAX_CLIENTS][4];
 
 char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*death1.wav",
@@ -995,6 +997,22 @@ static void CG_SetDeferredClientInfo( int clientNum, clientInfo_t *ci ) {
 	CG_LoadClientInfo( clientNum, ci );
 }
 
+/*
+======================
+CG_VariedModelColor
+======================
+*/
+static void CG_VariedModelColor( clientInfo_t *ci, int clientNum ) {
+	float h,s,v;
+
+	varied_model_colors[clientNum][0] = ci->color2[0];
+	varied_model_colors[clientNum][1] = ci->color2[1];
+	varied_model_colors[clientNum][2] = ci->color2[2];
+
+	// force our own saturation and value
+	Q_RGB2HSV(varied_model_colors[clientNum], &h, &s, &v);
+	Q_HSV2RGB(h, cg_variedModelSaturation.value, cg_variedModelValue.value, varied_model_colors[clientNum]);
+}
 
 /*
 ======================
@@ -1259,6 +1277,10 @@ void CG_NewClientInfo( int clientNum ) {
 			// truncate modelName
 			*slash = 0;
 		}
+	}
+
+	if ( cg_variedModelColors.integer && cg_variedModelColors.integer != 2 ) {
+		CG_VariedModelColor( &newInfo, clientNum );
 	}
 
 	// scan for an existing clientinfo that matches this modelname
@@ -2980,17 +3002,27 @@ void CG_PlayerColorFromString(char *str, float *h, float *s, float *v) {
 
 }
 
-static void CG_PlayerAutoColor(clientInfo_t *ci, float outColor[4]) {
-	int idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
-	outColor[0] = head_auto_colors[idx][0];
-	outColor[1] = head_auto_colors[idx][1];
-	outColor[2] = head_auto_colors[idx][2];
+/*
+=================
+CG_VariedModelAutoColor
+=================
+*/
+static void CG_VariedModelAutoColor(int idx) {
+	float h,s,v;
+
+	varied_model_colors[idx][0] = head_auto_colors[idx][0];
+	varied_model_colors[idx][1] = head_auto_colors[idx][1];
+	varied_model_colors[idx][2] = head_auto_colors[idx][2];
+
+	Q_RGB2HSV(varied_model_colors[idx], &h, &s, &v);
+	Q_HSV2RGB(h, cg_variedModelSaturation.value, cg_variedModelValue.value, varied_model_colors[idx]);
 }
 
 #define RGBA_SIZE (4*sizeof(byte))
-void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *outColor) {
+void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *outColor, int clientNum) {
 	clientInfo_t *player = &cgs.clientinfo[cg.clientNum];
 	int myteam = player->team;
+	int idx;
 
 	if (bodyPart < 0 || bodyPart > MCIDX_LEGS) {
 		CG_Error( "CG_PlayerGetColors: Invalid body part!\n");
@@ -3007,33 +3039,41 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 
 	if ((!(ci->forcedBrightModel)
 			&& ((cg_brightShells.integer || cg_brightOutline.integer ) && cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE))
-		       ) && (cgs.gametype == GT_FFA && ( !(cgs.ratFlags & RAT_ALLOWFORCEDMODELS) || (cg_variedModelColors.integer && (cgs.ratFlags & RAT_ALLOWFORCEDMODELS)) ) )) {
-		float color[4];
-		if ( cg_variedModelColors.integer && (cgs.ratFlags & RAT_ALLOWFORCEDMODELS) ) {
-			float h,s,v;
-			if (cg_variedModelColors.integer == 2) {
-				CG_PlayerAutoColor(ci, color);
-			}
-			else {
-				color[0] = ci->color2[0];
-				color[1] = ci->color2[1];
-				color[2] = ci->color2[2];
-			}
-			Q_RGB2HSV(color, &h, &s, &v);
-			Q_HSV2RGB(h, cg_variedModelSaturation.value, cg_variedModelValue.value, color);
-		}
-		else {
+		       ) && (cgs.gametype == GT_FFA )) {
+		if ( !(cgs.ratFlags & RAT_ALLOWFORCEDMODELS) ) {
+			float color[4];
 			color[0] = ci->color2[0];
 			color[1] = ci->color2[1];
 			color[2] = ci->color2[2];
+			if (isDead) {
+				color[0] *= 0.3;
+				color[1] *= 0.3;
+				color[2] *= 0.3;
+			}
+			CG_FloatColorToRGBA(color, outColor);
+			return;
 		}
-		if (isDead) {
-			color[0] *= 0.3;
-			color[1] *= 0.3;
-			color[2] *= 0.3;
+		else {
+			if ( cg_variedModelColors.integer ) {
+				float color[4];
+				if (cg_variedModelColors.integer == 2) {
+					idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
+				}
+				else {
+					idx = clientNum;
+				}
+				color[0] = varied_model_colors[idx][0];
+				color[1] = varied_model_colors[idx][1];
+				color[2] = varied_model_colors[idx][2];
+				if (isDead) {
+					color[0] *= 0.3;
+					color[1] *= 0.3;
+					color[2] *= 0.3;
+				}
+				CG_FloatColorToRGBA(color, outColor);
+				return;
+			}
 		}
-		CG_FloatColorToRGBA(color, outColor);
-		return;
 	}
 
 	if (myteam == TEAM_SPECTATOR && CG_IsTeamGametype()) {
@@ -3123,6 +3163,8 @@ int CG_CountPlayers(team_t team) {
 
 void CG_ParseForcedColors( void ) {
 	clientInfo_t *player = &cgs.clientinfo[cg.clientNum];
+	clientInfo_t *ci;
+	int i;
 	int myteam = player->team;
 	float h,s,v;
 	float color[4];
@@ -3245,6 +3287,21 @@ void CG_ParseForcedColors( void ) {
 		CG_FloatColorToRGBA(color, cgs.corpseRGBA[bodyPart][MODELCOLOR_ENEMY]);
 	}
 
+	if ( cg_variedModelColors.integer == 2 ) {
+		for ( i = 0; i < MAX_AUTOHEADCOLORS; i++ ) {
+			CG_VariedModelAutoColor( i );
+		}
+	}
+	else if ( cg_variedModelColors.integer ) {
+		for ( i = 0; i < MAX_CLIENTS; i++ ) {
+			ci = &cgs.clientinfo[ i ];
+			if ( !ci->infoValid ) {
+				continue;
+			}
+			CG_VariedModelColor( ci, i );
+		}
+	}
+
 }
 
 
@@ -3350,8 +3407,8 @@ void CG_Player( centity_t *cent ) {
 	memset( &head, 0, sizeof(head) );
 
 	useDeadColors = (cent->currentState.eFlags & EF_DEAD && !CG_IsFrozenPlayer(cent)) ? qtrue : qfalse;
-	CG_PlayerGetColors(ci, useDeadColors, MCIDX_TORSO, torso.shaderRGBA);
-	CG_PlayerGetColors(ci, useDeadColors, MCIDX_LEGS, legs.shaderRGBA);
+	CG_PlayerGetColors(ci, useDeadColors, MCIDX_TORSO, torso.shaderRGBA, clientNum);
+	CG_PlayerGetColors(ci, useDeadColors, MCIDX_LEGS, legs.shaderRGBA, clientNum);
 	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE) 
 					&& (cg_brightShells.integer || cg_brightOutline.integer) 
 					&& (cgs.gametype != GT_FFA || cgs.ratFlags & RAT_ALLOWFORCEDMODELS)))
@@ -3362,7 +3419,7 @@ void CG_Player( centity_t *cent ) {
 		CG_PlayerAutoHeadColor(ci, head.shaderRGBA);
 		autoHeadColors = qtrue;
 	} else {
-		CG_PlayerGetColors(ci, useDeadColors, MCIDX_HEAD, head.shaderRGBA);
+		CG_PlayerGetColors(ci, useDeadColors, MCIDX_HEAD, head.shaderRGBA, clientNum);
 	}
 
 	// get the rotation information

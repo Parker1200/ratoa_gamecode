@@ -328,7 +328,7 @@ CG_Draw3DHead
 
 ================
 */
-void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, clientInfo_t *ci) {
+void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, clientInfo_t *ci, int clientNum) {
 	refdef_t		refdef;
 	refEntity_t		ent;
 	qboolean autoHeadColors = qfalse;
@@ -358,7 +358,7 @@ void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle
 		CG_PlayerAutoHeadColor(ci, ent.shaderRGBA);
 		autoHeadColors = qtrue;
 	} else {
-		CG_PlayerGetColors(ci, qfalse, MCIDX_HEAD, ent.shaderRGBA);
+		CG_PlayerGetColors(ci, qfalse, MCIDX_HEAD, ent.shaderRGBA, clientNum);
 	}
 
 	refdef.rdflags = RDF_NOWORLDMODEL;
@@ -433,7 +433,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		// allow per-model tweaking
 		VectorAdd( origin, ci->headOffset, origin );
 
-		CG_Draw3DHead( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci );
+		CG_Draw3DHead( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci, clientNum );
 	} else if ( cg_drawIcons.integer ) {
 		CG_DrawPic( x, y, w, h, ci->modelIcon );
 	}
