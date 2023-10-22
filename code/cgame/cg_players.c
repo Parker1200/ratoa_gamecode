@@ -3056,12 +3056,7 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 		else {
 			if ( cg_variedModelColors.integer ) {
 				float color[4];
-				if (cg_variedModelColors.integer == 2) {
-					idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
-				}
-				else {
-					idx = clientNum;
-				}
+				idx = (cg_variedModelColors.integer == 2) ? ci->playerColorIndex : clientNum;
 				color[0] = varied_model_colors[idx][0];
 				color[1] = varied_model_colors[idx][1];
 				color[2] = varied_model_colors[idx][2];
@@ -3306,7 +3301,7 @@ void CG_ParseForcedColors( void ) {
 
 
 void CG_PlayerAutoHeadColor(clientInfo_t *ci, byte *outColor) {
-	int idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
+	int idx = ci->playerColorIndex;
 	outColor[0] = head_auto_colors[idx][0];
 	outColor[1] = head_auto_colors[idx][1];
 	outColor[2] = head_auto_colors[idx][2];

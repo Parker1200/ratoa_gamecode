@@ -413,6 +413,10 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 
 	ci = &cgs.clientinfo[ clientNum ];
 
+	if ( !ci->infoValid ) {
+		return;
+	}
+
 	if ( cg_draw3dIcons.integer ) {
 		cm = ci->headModel;
 		if ( !cm ) {
