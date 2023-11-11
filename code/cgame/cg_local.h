@@ -385,6 +385,8 @@ typedef struct predictedMissile_s {
 	trajectory_t	pos;
 	trajectory_t	angles;
 
+	int	startTime;
+
 	// time at which to remove this missile even if it was not confirmed by the server
 	int	removeTime;
 
@@ -1767,6 +1769,7 @@ extern vmCvar_t                	cg_predictWeapons;
 extern vmCvar_t                	cg_predictExplosions;
 extern vmCvar_t                	cg_predictPlayerExplosions;
 extern vmCvar_t                	cg_ratPredictMissiles;
+extern vmCvar_t                	cg_ratFixPredictedBFG;
 extern vmCvar_t                	cg_ratScoreboard;
 extern vmCvar_t                	cg_ratScoreboardAccuracy;
 extern vmCvar_t                	cg_ratStatusbar;

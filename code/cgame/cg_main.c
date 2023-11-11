@@ -219,6 +219,7 @@ vmCvar_t 	cg_predictWeapons;
 vmCvar_t 	cg_predictExplosions;
 vmCvar_t 	cg_predictPlayerExplosions;
 vmCvar_t 	cg_ratPredictMissiles;
+vmCvar_t 	cg_ratFixPredictedBFG;
 vmCvar_t 	cg_delagProjectileTrail;
 vmCvar_t 	cg_ratScoreboard;
 vmCvar_t 	cg_ratScoreboardAccuracy;
@@ -681,6 +682,7 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_predictPlayerExplosions, "cg_predictPlayerExplosions", "0", CVAR_ARCHIVE},
 
 	{ &cg_ratPredictMissiles, "cg_ratPredictMissiles", "1", CVAR_ARCHIVE},
+	{ &cg_ratFixPredictedBFG, "cg_ratFixPredictedBFG", "1", CVAR_ARCHIVE},
 	{ &cg_delagProjectileTrail, "cg_delagProjectileTrail", "1", CVAR_ARCHIVE},
 	{ &cg_ratScoreboard, "cg_ratScoreboard", "1", CVAR_ARCHIVE},
 	{ &cg_ratScoreboardAccuracy, "cg_ratScoreboardAccuracy", "1", CVAR_ARCHIVE},

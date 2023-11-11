@@ -342,6 +342,10 @@ void CG_RunPredictedMissile( predictedMissile_t *pm) {
 		return;
 	}
 
+	if  ( cg_ratFixPredictedBFG.integer && pm->weapon == WP_BFG && (cg.time - pm->startTime) < 20 ) {
+		return;
+	}
+
 	timeshift = 1000 / sv_fps.integer;
 	time = cg.time + timeshift;
 
@@ -776,6 +780,7 @@ predictedMissile_t *CG_BasePredictMissile( entityState_t *ent,  vec3_t muzzlePoi
 	int lifetime = CG_ReliablePing() + PMISSILE_WINDOWTIME;
 
 	pm = CG_AllocPMissile();
+	pm->startTime = cg.time;
 	pm->removeTime = cg.time + lifetime;
 	pm->weapon = ent->weapon;
 
