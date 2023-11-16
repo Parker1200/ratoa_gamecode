@@ -342,10 +342,6 @@ void CG_RunPredictedMissile( predictedMissile_t *pm) {
 		return;
 	}
 
-	if  ( cg_ratFixPredictedBFG.integer && pm->weapon == WP_BFG && (cg.time - pm->startTime) < 20 ) {
-		return;
-	}
-
 	timeshift = 1000 / sv_fps.integer;
 	time = cg.time + timeshift;
 
@@ -365,6 +361,11 @@ void CG_RunPredictedMissile( predictedMissile_t *pm) {
 
 		// still in free fall
 		VectorCopy( newOrigin, pm->refEntity.origin );
+
+		if  ( cg_ratFixPredictedBFG.integer && pm->weapon == WP_BFG && (cg.time - pm->startTime) < 20 ) {
+			return;
+		}
+
 		if ( weapon->missileDlight ) {
 			trap_R_AddLightToScene(newOrigin, weapon->missileDlight, 
 					weapon->missileDlightColor[0], weapon->missileDlightColor[1], weapon->missileDlightColor[2] );
