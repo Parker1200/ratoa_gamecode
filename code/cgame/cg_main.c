@@ -523,11 +523,13 @@ static cvarTable_t cvarTable[] = { // bk001129
 	//
 	// These new defaults result in about the same FOV on 5:4 or 4:3 screens 
 	// while providing a much better horizontal FOV on widescreens
-	// { &cg_fov, "cg_fov", "100", CVAR_ARCHIVE },
-	// { &cg_horplus, "cg_horplus", "0", CVAR_ARCHIVE },
+	//
+	// The original code from the upstream Ratmod was:
+	// { &cg_fov, "cg_fov", "77", CVAR_ARCHIVE },
+	// { &cg_horplus, "cg_horplus", "1", CVAR_ARCHIVE },
 	// -------
-	// x-ratmod disables cg_horplus by default because it confuses players who are used to the expected
-	// effects of changing cg_fov in games using the Quake 3 engine
+	// x-ratmod disables cg_horplus by default because it confuses players who are used to the expected cg_fov
+	// behavior in games based on the Quake 3 engine (id Tech 3)
 	{ &cg_fov, "cg_fov", "100", CVAR_ARCHIVE },
 	{ &cg_horplus, "cg_horplus", "0", CVAR_ARCHIVE },
 
@@ -1066,7 +1068,7 @@ int CG_MigrateOldCrosshair(int old) {
  * Update really old ratmod configurations
  * This might be removed in the future
  */
-#define LATEST_XRATINITIALIZED 1
+#define LATEST_XRATINITIALIZED 2
 void CG_XRatOldCfgUpdate(void) {
 	// x-ratmod
 	if (cg_xratInitialized.integer < 1) {
@@ -1078,6 +1080,16 @@ void CG_XRatOldCfgUpdate(void) {
 		}
 
 		CG_Cvar_SetAndUpdate( "cg_xratInitialized", "1" );
+	}
+
+	if (cg_xratInitialized.integer < 2) {
+		// unset old unused variables
+		trap_SendConsoleCommand("unset cg_individualColors;"
+		"unset cg_playerColorSaturation;"
+		"unset cg_playerColorValue\n"
+		);
+
+			CG_Cvar_SetAndUpdate( "cg_xratInitialized", "2" );
 	}
 }
 
