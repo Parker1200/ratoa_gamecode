@@ -111,7 +111,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 
 	for ( i = 0 ; i < MAX_CUSTOM_SOUNDS && cg_customSoundNames[i] ; i++ ) {
 		if ( !strcmp( soundName, cg_customSoundNames[i] ) ) {
-			if ((cgs.ratFlags & RAT_ALLOWFORCEDMODELS)) {
+			if ((cgs.ratFlags & RAT_ALLOWFORCEDMODELS) && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1)) {
 				if (ci == myself && cgs.mySounds[i]) {
 					return cgs.mySounds[i];
 				} else if ((myteam != TEAM_FREE && ci->team == myteam) && cgs.teamSounds[i]) {
@@ -1122,7 +1122,7 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 	}
 
-	if (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && 
+	if (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1) &&
 			(  (!enemy && cg_teamModel.string[0]) ||
 			   ( enemy && cg_enemyModel.string[0])
 			)) {
@@ -1154,7 +1154,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 		newInfo.forcedBrightModel = (strcmp(newInfo.skinName, "bright") == 0);
 		newInfo.forcedModel = qtrue;
-	} else if ( cg_forceModel.integer ) {
+	} else if ( cg_forceModel.integer >= 1 ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
 		char modelStr[MAX_QPATH];
@@ -1202,7 +1202,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// head model
 	v = Info_ValueForKey( configstring, "hmodel" );
-	if (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && 
+	if (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1) &&
 			(  (!enemy && cg_teamModel.string[0]) ||
 			   ( enemy && cg_enemyModel.string[0])
 			)) {
@@ -1234,7 +1234,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 		newInfo.forcedBrightModel = (strcmp(newInfo.skinName, "bright") == 0);
 		newInfo.forcedModel = qtrue;
-	} else if ( cg_forceModel.integer ) {
+	} else if ( cg_forceModel.integer >= 1 ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
 		char modelStr[MAX_QPATH];
@@ -1279,7 +1279,7 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 	}
 
-	if ( cg_variedModelColors.integer && cg_variedModelColors.integer != 2 ) {
+	if ( cgs.ratFlags & RAT_ALLOWFORCEDMODELS && (cg_variedModelColors.integer || cg_forceModel.integer <= -1) && cg_variedModelColors.integer != 2 ) {
 		CG_VariedModelColor( &newInfo, clientNum );
 	}
 
@@ -2643,6 +2643,9 @@ static void CG_PlayerSplash( centity_t *cent ) {
 }
 
 byte CG_GetBrightShellAlpha(void) {
+	if ( cg_extraBrightShells.integer || (cg_forceModel.integer <= -1 && cgs.gametype == GT_FFA && cgs.ratFlags & RAT_ALLOWFORCEDMODELS) ) {
+		return (byte)0xff * MAX(MIN(cg_extraBrightShellAlpha.value, 0.8), 0.1);
+	}
 	return (byte)0xff * MAX(MIN(cg_brightShellAlpha.value, cgs.maxBrightshellAlpha), 0.1);
 }
 
@@ -2661,6 +2664,7 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 */
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team, qboolean isMissile,
 	       	clientInfo_t *ci, int orderIndicator, qboolean useBlendBrightshell ) {
+	qboolean brightShellBlocked;
 
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {
             if( (cgs.dmflags & DF_INVIS) == 0) {
@@ -2686,7 +2690,9 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 			if ((cgs.ratFlags & RAT_BRIGHTSHELL) && cg_brightShells.integer) {
 				ent->shaderRGBA[3] = CG_GetBrightShellAlpha();
 
-				if (cg_brightShells.integer == 1) {
+				brightShellBlocked = ( (cgs.ratFlags & RAT_ALLOWFORCEDMODELS) &&
+									(cgs.gametype == GT_FFA && (cg_forceModel.integer <= -1 || (cg_variedModelColors.integer && cg_extraBrightShells.integer))) );
+				if (cg_brightShells.integer == 1 && !brightShellBlocked) {
 					// useBlendBrightshell is usually true
 					// for head models, to make darker auto
 					// head colors work
@@ -2696,7 +2702,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 				} else if (cg_brightShells.integer == 2) {
 					ent->customShader = cgs.media.brightShellFlat;
 					trap_R_AddRefEntityToScene( ent );
-				} else if (cg_brightShells.integer == 3) {
+				} else if (cg_brightShells.integer == 3 && !brightShellBlocked) {
 					ent->customShader = cgs.media.brightShellBlend;
 					trap_R_AddRefEntityToScene( ent );
 				} else {
@@ -3054,7 +3060,7 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 			return;
 		}
 		else {
-			if ( cg_variedModelColors.integer ) {
+			if ( cg_variedModelColors.integer || cg_forceModel.integer <= -1 ) {
 				float color[4];
 				idx = (cg_variedModelColors.integer == 2) ? ci->playerColorIndex : clientNum;
 				color[0] = varied_model_colors[idx][0];
@@ -3107,7 +3113,7 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 
 
 qboolean CG_AllowColoredProjectiles(void) {
-	return (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE));
+	return (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1) && cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE));
 }
 
 void CG_ProjectileColor(team_t team, byte *outColor) {
@@ -3287,7 +3293,7 @@ void CG_ParseForcedColors( void ) {
 			CG_VariedModelAutoColor( i );
 		}
 	}
-	else if ( cg_variedModelColors.integer ) {
+	else if ( cg_variedModelColors.integer || (cg_forceModel.integer <= -1 && cgs.ratFlags & RAT_ALLOWFORCEDMODELS) ) {
 		for ( i = 0; i < MAX_CLIENTS; i++ ) {
 			ci = &cgs.clientinfo[ i ];
 			if ( !ci->infoValid ) {
@@ -3406,7 +3412,7 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerGetColors(ci, useDeadColors, MCIDX_LEGS, legs.shaderRGBA, clientNum);
 	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE) 
 					&& (cg_brightShells.integer || cg_brightOutline.integer) 
-					&& (cgs.gametype != GT_FFA || cgs.ratFlags & RAT_ALLOWFORCEDMODELS)))
+					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1)))))
 			&& ci->team != TEAM_SPECTATOR &&
 			( (cg_teamHeadColorAuto.integer && ci->team == cg.snap->ps.persistant[PERS_TEAM])
 			  || (cg_enemyHeadColorAuto.integer && ci->team != cg.snap->ps.persistant[PERS_TEAM])

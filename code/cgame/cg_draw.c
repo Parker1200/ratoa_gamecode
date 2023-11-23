@@ -324,20 +324,20 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 
 /*
 ================
-CG_Draw3DHead
+CG_Draw3DHeadModel
 
 ================
 */
-void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, clientInfo_t *ci, int clientNum) {
+static void CG_Draw3DHeadModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin,
+								vec3_t angles, byte shaderRGBA[4], qboolean fakeOutline, qhandle_t customShader ) {
 	refdef_t		refdef;
 	refEntity_t		ent;
-	qboolean autoHeadColors = qfalse;
 
 	if ( !cg_draw3dIcons.integer || !cg_drawIcons.integer ) {
 		return;
 	}
 
-	CG_AdjustFrom640( &x, &y, &w, &h );
+	// CG_AdjustFrom640( &x, &y, &w, &h );
 
 	memset( &refdef, 0, sizeof( refdef ) );
 
@@ -348,18 +348,9 @@ void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle
 	ent.customSkin = skin;
 	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
 
-	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE) 
-					&& (cg_brightShells.integer || cg_brightOutline.integer) 
-					&& (cgs.gametype != GT_FFA || cgs.ratFlags & RAT_ALLOWFORCEDMODELS)))
-			&& ci->team != TEAM_SPECTATOR &&
-			( (cg_teamHeadColorAuto.integer && ci->team == cg.snap->ps.persistant[PERS_TEAM])
-			  || (cg_enemyHeadColorAuto.integer && ci->team != cg.snap->ps.persistant[PERS_TEAM])
-			)) {
-		CG_PlayerAutoHeadColor(ci, ent.shaderRGBA);
-		autoHeadColors = qtrue;
-	} else {
-		CG_PlayerGetColors(ci, qfalse, MCIDX_HEAD, ent.shaderRGBA, clientNum);
-	}
+	ent.shaderRGBA[0] = shaderRGBA[0];
+	ent.shaderRGBA[1] = shaderRGBA[1];
+	ent.shaderRGBA[2] = shaderRGBA[2];
 
 	refdef.rdflags = RDF_NOWORLDMODEL;
 
@@ -376,25 +367,82 @@ void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle
 	refdef.time = cg.time;
 
 	trap_R_ClearScene();
+
+	if ( !fakeOutline ) {
+		trap_R_AddRefEntityToScene( &ent );
+		ent.shaderRGBA[3] = shaderRGBA[3];
+	}
+	else {
+		ent.shaderRGBA[3] = 0xff;
+	}
+	if (customShader > -1 ) {
+		ent.customShader = customShader;
+	}
 	trap_R_AddRefEntityToScene( &ent );
+
+	trap_R_RenderScene( &refdef );
+}
+
+/*
+================
+CG_Draw3DHead
+
+================
+*/
+void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, clientInfo_t *ci, int clientNum) {
+	byte shaderRGBA[4];
+	qboolean autoHeadColors = qfalse;
+
+	if ( !cg_draw3dIcons.integer || !cg_drawIcons.integer ) {
+		return;
+	}
+
+	CG_AdjustFrom640( &x, &y, &w, &h );
+
+	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE)
+					&& (cg_brightShells.integer || cg_brightOutline.integer)
+					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= 1)))))
+			&& ci->team != TEAM_SPECTATOR &&
+			( (cg_teamHeadColorAuto.integer && ci->team == cg.snap->ps.persistant[PERS_TEAM])
+			  || (cg_enemyHeadColorAuto.integer && ci->team != cg.snap->ps.persistant[PERS_TEAM])
+			)) {
+		CG_PlayerAutoHeadColor(ci, shaderRGBA);
+		autoHeadColors = qtrue;
+	} else {
+		CG_PlayerGetColors(ci, qfalse, MCIDX_HEAD, shaderRGBA, clientNum);
+	}
+
 	if (!ci->forcedBrightModel) {
 		if (cgs.ratFlags & RAT_BRIGHTSHELL && cg_brightShells.integer) {
-			ent.shaderRGBA[3] = CG_GetBrightShellAlpha();
-			if (cg_brightShells.integer == 2) {
-				ent.customShader = cgs.media.brightShellFlat;
-			} else {
-				ent.customShader = (autoHeadColors || cg_brightShells.integer == 3) ? 
-					cgs.media.brightShellBlend : cgs.media.brightShell;
+			shaderRGBA[3] = CG_GetBrightShellAlpha();
+			if (cgs.gametype == GT_FFA && cg_forceModel.integer <= -1 && cgs.ratFlags & RAT_ALLOWFORCEDMODELS) {
+				// TODO: use a shader with outline which is also suitable for models like: Beret, Ghost, Metalbot etc.
+				if ( cg_brightShells.integer != 2 ) {
+					// draw a fake outline
+					CG_Draw3DHeadModel( x-2, y-2, w+4, h+4, model, skin, origin, angles, shaderRGBA, qtrue, cgs.media.brightShellFlat );
+				}
+				CG_Draw3DHeadModel( x, y, w, h, model, skin, origin, angles, shaderRGBA, qfalse, cgs.media.brightShellFlat );
+				return;
 			}
-			trap_R_AddRefEntityToScene( &ent );
+			else {
+				if (cg_brightShells.integer == 2) {
+					CG_Draw3DHeadModel( x, y, w, h, model, skin, origin, angles, shaderRGBA, qfalse, cgs.media.brightShellFlat );
+					return;
+				} else {
+					CG_Draw3DHeadModel( x, y, w, h, model, skin, origin, angles, shaderRGBA, qfalse, (autoHeadColors || cg_brightShells.integer == 3) ?
+						cgs.media.brightShellBlend : cgs.media.brightShell);
+					return;
+				}
+			}
 		} else if (cgs.ratFlags & RAT_BRIGHTOUTLINE && cg_brightOutline.integer) {
-			ent.shaderRGBA[3] = CG_GetBrightOutlineAlpha();
-			ent.customShader = (autoHeadColors || cg_brightOutline.integer == 2) ? 
-				cgs.media.brightOutlineSmallBlend : cgs.media.brightOutlineSmall;
-			trap_R_AddRefEntityToScene( &ent );
+			shaderRGBA[3] = CG_GetBrightOutlineAlpha();
+			CG_Draw3DHeadModel( x, y, w, h, model, skin, origin, angles, shaderRGBA, qfalse, (autoHeadColors || cg_brightOutline.integer == 2) ?
+				cgs.media.brightOutlineSmallBlend : cgs.media.brightOutlineSmall);
+			return;
 		}
 	}
-	trap_R_RenderScene( &refdef );
+
+	CG_Draw3DHeadModel( x, y, w, h, model, skin, origin, angles, shaderRGBA, qfalse, -1 );
 }
 
 /*

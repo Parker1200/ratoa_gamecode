@@ -325,6 +325,9 @@ vmCvar_t	cg_brightShells;
 vmCvar_t	cg_brightShellAlpha;
 vmCvar_t	cg_brightOutline;
 
+vmCvar_t	cg_extraBrightShells;
+vmCvar_t	cg_extraBrightShellAlpha;
+
 vmCvar_t	cg_enemyModel;
 vmCvar_t	cg_teamModel;
 
@@ -803,6 +806,9 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_brightShells ,     "cg_brightShells", "1", CVAR_ARCHIVE},
 	{ &cg_brightShellAlpha , "cg_brightShellAlpha", "1.0", CVAR_ARCHIVE},
 	{ &cg_brightOutline ,     "cg_brightOutline", "1", CVAR_ARCHIVE},
+
+	{ &cg_extraBrightShells ,      "cg_extraBrightShells", "0", CVAR_ARCHIVE},
+	{ &cg_extraBrightShellAlpha ,  "cg_extraBrightShellAlpha", "1.0", CVAR_ARCHIVE},
 
 	{ &cg_enemyModel ,     "cg_enemyModel", "smarine/gray", CVAR_ARCHIVE},
 	{ &cg_teamModel ,      "cg_teamModel", "sarge/gray", CVAR_ARCHIVE},

@@ -1872,6 +1872,8 @@ extern vmCvar_t			cg_brightShells;
 extern vmCvar_t			cg_brightShellAlpha;
 extern vmCvar_t			cg_brightOutline;
 
+extern vmCvar_t			cg_extraBrightShells;
+extern vmCvar_t			cg_extraBrightShellAlpha;
 
 extern vmCvar_t			cg_enemyModel;
 extern vmCvar_t			cg_teamModel;

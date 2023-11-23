@@ -597,7 +597,7 @@ void CG_PainEvent( centity_t *cent, int health ) {
 }
 
 footstep_t CG_Footsteps(clientInfo_t *ci) {
-	if ((cgs.ratFlags & RAT_ALLOWFORCEDMODELS)) {
+	if ((cgs.ratFlags & RAT_ALLOWFORCEDMODELS) && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1)) {
 		footstep_t footsteps = -1;
 		int myteam;
 		clientInfo_t *myself;
