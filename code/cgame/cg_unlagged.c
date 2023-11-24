@@ -365,7 +365,7 @@ void CG_RunPredictedMissile( predictedMissile_t *pm) {
 		// still in free fall
 		VectorCopy( newOrigin, pm->refEntity.origin );
 
-		if  ( cg_ratFixPredictedBFG.integer && pm->weapon == WP_BFG && (cg.time - pm->startTime) < 20 ) {
+		if ( cg_ratFixPredictedBFG.integer > 0 && pm->weapon == WP_BFG && (cg.time - pm->startTime) < cg_ratFixPredictedBFG.integer ) {
 			return;
 		}
 
