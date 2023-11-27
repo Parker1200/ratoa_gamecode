@@ -1117,3 +1117,19 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 }
 
+
+/*
+=================
+CG_SkipFrame
+
+=================
+*/
+void CG_SkipFrame( int serverTime ) {
+		cg.time = serverTime;
+		cg.frametime = cg.time - cg.oldTime;
+		if ( cg.frametime < 0 ) {
+				cg.frametime = 0;
+		}
+		cg.oldTime = cg.time;
+}
+

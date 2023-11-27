@@ -235,4 +235,7 @@ typedef enum {
 //	void (*CG_EventHandling)(int type);
 } cgameExport_t;
 
+#define	CG_SKIP_FRAME		100
+//	void (*CG_SkipFrame)( int serverTime );
+
 //----------------------------------------------

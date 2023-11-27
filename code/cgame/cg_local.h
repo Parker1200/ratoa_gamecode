@@ -2123,6 +2123,7 @@ void CG_AddBufferedSound( sfxHandle_t sfx);
 int CG_AddBufferedRewardSound( sfxHandle_t sfx );
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
+void CG_SkipFrame( int serverTime );
 
 
 //

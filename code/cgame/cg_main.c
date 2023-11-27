@@ -88,6 +88,9 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
+	case CG_SKIP_FRAME:
+		CG_SkipFrame( arg0 );
+		return 0;
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
 		break;
@@ -497,6 +500,8 @@ vmCvar_t	cg_teamChatBeep;
 
 vmCvar_t	cg_ui_clientCommand;
 
+vmCvar_t	xratrev;
+
 #define MASTER_SERVER_NAME "dpmaster.deathmask.net"
 
 typedef struct {
@@ -849,6 +854,9 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_thTokenstyle ,           	   "cg_thTokenstyle", "-999", CVAR_ROM},
 
 	{ &cg_autorecord ,           	   "cg_autorecord", "0", CVAR_ARCHIVE},
+
+	// to announce frameskip support to the client, cg_xratInitialized cannot be used here
+	{ &xratrev,                        "xratrev", "1", CVAR_ROM },
 
 	// / RAT ===================
 
