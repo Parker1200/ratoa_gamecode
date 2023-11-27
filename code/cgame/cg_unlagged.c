@@ -45,7 +45,10 @@ predictedMissile_t	*cg_freePMissiles;		// single linked list
 
 // how much longer than the player's roundtrip time  a predicted missile will
 // stay alive awaiting confirmation from the server
-#define PMISSILE_WINDOWTIME 30
+// if the player's firing command arrives right after the start of the frame,
+// the missile will be included in the next snapshot (1000/sv_fps later), so it
+// should be at least that long
+#define PMISSILE_WINDOWTIME(fps) (1.5*1000/fps)
 
 /*
 ===================
@@ -136,9 +139,9 @@ void CG_RecoverMissile(centity_t *missile) {
 		return;
 	}
 
-	//if (pms->explosionTime + 1000/sv_fps.integer + CG_ProjectileNudgeTimeshift(missile) < cg.time) {
+	//if (pms->explosionTime + 1000/cgs.sv_fps + CG_ProjectileNudgeTimeshift(missile) < cg.time) {
 	// only actually recover if there really was an explosion drawn
-	if (pms->explosionTime && pms->explosionTime + 1000/sv_fps.integer + CG_ProjectileNudgeTimeshift(missile) < cg.time) {
+	if (pms->explosionTime && pms->explosionTime + 1000/cgs.sv_fps + CG_ProjectileNudgeTimeshift(missile) < cg.time) {
 		// missile is still around at a time when we should have the
 		// confirmation from the server that it exploded. Prediction was
 		// wrong, recover the missile
@@ -176,8 +179,8 @@ void CG_RemovePredictedMissile( centity_t *missile) {
 			continue;
 		}
 
-		if (missile->currentState.pos.trTime - PMISSILE_WINDOWTIME > pm->pos.trTime
-				|| missile->currentState.pos.trTime + PMISSILE_WINDOWTIME < pm->pos.trTime) {
+		if (missile->currentState.pos.trTime - PMISSILE_WINDOWTIME(cgs.sv_fps) > pm->pos.trTime
+				|| missile->currentState.pos.trTime + PMISSILE_WINDOWTIME(cgs.sv_fps) < pm->pos.trTime) {
 			continue;
 		}
 
@@ -235,7 +238,7 @@ qboolean CG_ExplosionPredicted(centity_t *cent, int checkFlags, vec3_t realExpOr
 void CG_UpdateMissileStatus(predictedMissileStatus_t *pms, int addedFlags, vec3_t explosionOrigin, int hitEntity) {
 	pms->missileFlags |= addedFlags;
 	VectorCopy(explosionOrigin, pms->explosionPos);
-	pms->explosionTime = cg.time + 1000 / sv_fps.integer;
+	pms->explosionTime = cg.time + 1000 / cgs.sv_fps;
 	pms->hitEntity = hitEntity;
 }
 
@@ -342,7 +345,7 @@ void CG_RunPredictedMissile( predictedMissile_t *pm) {
 		return;
 	}
 
-	timeshift = 1000 / sv_fps.integer;
+	timeshift = 1000 / cgs.sv_fps;
 	time = cg.time + timeshift;
 
 	// calculate new position
@@ -499,10 +502,10 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 
 						c->currentState.pos.trTime = TR_LINEAR_STOP;
 						c->currentState.pos.trTime = cg.snap->serverTime;
-						c->currentState.pos.trDuration = 1000 / sv_fps.integer;
+						c->currentState.pos.trDuration = 1000 / cgs.sv_fps;
 
 						BG_EvaluateTrajectory( &c->currentState.pos, cg.snap->serverTime, origin1 );
-						BG_EvaluateTrajectory( &c->currentState.pos, cg.snap->serverTime + 1000 / sv_fps.integer, origin2 );
+						BG_EvaluateTrajectory( &c->currentState.pos, cg.snap->serverTime + 1000 / cgs.sv_fps, origin2 );
 
 						// print some debugging stuff exactly like what the server does
 
@@ -778,7 +781,7 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 predictedMissile_t *CG_BasePredictMissile( entityState_t *ent,  vec3_t muzzlePoint ) {
 	predictedMissile_t	*pm;
 	refEntity_t	*bolt;
-	int lifetime = CG_ReliablePing() + PMISSILE_WINDOWTIME;
+	int lifetime = CG_ReliablePing() + PMISSILE_WINDOWTIME(cgs.sv_fps);
 
 	pm = CG_AllocPMissile();
 	pm->startTime = cg.time;
@@ -788,7 +791,8 @@ predictedMissile_t *CG_BasePredictMissile( entityState_t *ent,  vec3_t muzzlePoi
 	bolt = &pm->refEntity;
 
 	VectorCopy(muzzlePoint, pm->pos.trBase);
-	pm->pos.trTime = cg.time-cgs.predictedMissileNudge-cg.cmdMsecDelta;
+	// oldTime is our attackTime
+	pm->pos.trTime = cg.oldTime-cgs.predictedMissileNudge;
 
 	if (BG_IsElimGT(cgs.gametype)
 			&& cg.warmup == 0 && cgs.roundStartTime 

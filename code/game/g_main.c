@@ -276,11 +276,7 @@ vmCvar_t        g_maxExtrapolatedFrames;
 vmCvar_t        g_delagMissileMaxLatency; 
 vmCvar_t        g_delagMissileDebug; 
 vmCvar_t        g_delagMissiles; 
-vmCvar_t        g_delagMissileLimitVariance;
-vmCvar_t        g_delagMissileLimitVarianceMs;
 vmCvar_t        g_delagMissileBaseNudge; 
-vmCvar_t        g_delagMissileLatencyMode; 
-vmCvar_t        g_delagMissileCorrectFrameOffset; 
 vmCvar_t        g_delagMissileNudgeOnly; 
 vmCvar_t        g_delagMissileImmediateRun; 
 
@@ -602,11 +598,11 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_delagAllowHitsAfterTele, "g_delagAllowHitsAfterTele", "1", CVAR_ARCHIVE , 0, qfalse },
 	{ &g_truePing, "g_truePing", "1", CVAR_ARCHIVE, 0, qtrue },
 	// it's CVAR_SYSTEMINFO so the client's sv_fps will be automagically set to its value
-	{ &sv_fps, "sv_fps", "20", CVAR_SYSTEMINFO | CVAR_ARCHIVE, 0, qfalse },
+	{ &sv_fps, "sv_fps", STRINGIFY(DEFAULT_SV_FPS), CVAR_SYSTEMINFO | CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qfalse },
         { &g_lagLightning, "g_lagLightning", "0", CVAR_ARCHIVE, 0, qtrue },
 //unlagged - server options
         { &g_ambientSound, "g_ambientSound", "1", CVAR_ARCHIVE, 0, qfalse },
-        { &g_rocketSpeed, "g_rocketSpeed", "900", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qtrue },
+        { &g_rocketSpeed, "g_rocketSpeed", "1000", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qtrue },
 	// TODO: CVAR_ARCHIVE
         { &g_maxExtrapolatedFrames, "g_maxExtrapolatedFrames", "2", 0 , 0, qfalse },
 
@@ -614,15 +610,10 @@ static cvarTable_t		gameCvarTable[] = {
         { &g_delagMissileMaxLatency, "g_delagMissileMaxLatency", "500", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
         { &g_delagMissileDebug, "g_delagMissileDebug", "0", 0, 0, qfalse },
         { &g_delagMissiles, "g_delagMissiles", "1", CVAR_ARCHIVE, 0, qfalse },
-        { &g_delagMissileLimitVariance, "g_delagMissileLimitVariance", "1", CVAR_ARCHIVE, 0, qfalse },
-        { &g_delagMissileLimitVarianceMs, "g_delagMissileLimitVarianceMs", "25", CVAR_ARCHIVE, 0, qfalse },
-        { &g_delagMissileLatencyMode, "g_delagMissileLatencyMode", "1", CVAR_ARCHIVE, 0, qfalse },
-        { &g_delagMissileCorrectFrameOffset, "g_delagMissileCorrectFrameOffset", "1", CVAR_ARCHIVE, 0, qfalse },
-        { &g_delagMissileNudgeOnly, "g_delagMissileNudgeOnly", "0", CVAR_ARCHIVE, 0, qfalse },
         { &g_delagMissileImmediateRun, "g_delagMissileImmediateRun", "2", CVAR_ARCHIVE, 0, qfalse },
-
         { &g_predictMissiles, "g_predictMissiles", "1", CVAR_ARCHIVE, 0, qfalse },
         { &g_delagMissileBaseNudge, "g_delagMissileBaseNudge", "10", CVAR_ARCHIVE | CVAR_SERVERINFO, 0, qfalse },
+        { &g_delagMissileNudgeOnly, "g_delagMissileNudgeOnly", "0", CVAR_ARCHIVE, 0, qfalse },
 
 
         { &g_teleporterPrediction, "g_teleporterPrediction", "1", 0, 0, qfalse },
@@ -2143,6 +2134,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_UpdateMultiTrnGames();
 #endif
 	CalculateRanks();
+
+	G_PrintDelagMaxTimeshift();
 }
 
 
