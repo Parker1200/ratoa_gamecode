@@ -1125,11 +1125,18 @@ CG_SkipFrame
 =================
 */
 void CG_SkipFrame( int serverTime ) {
-		cg.time = serverTime;
-		cg.frametime = cg.time - cg.oldTime;
-		if ( cg.frametime < 0 ) {
-				cg.frametime = 0;
-		}
-		cg.oldTime = cg.time;
+	cg.time = serverTime;
+
+	if ( cg.infoScreenText[0] != 0 || !cg.snap || ( cg.snap->snapFlags & SNAPFLAG_NOT_ACTIVE ) ) {
+		return;
+	}
+
+	CG_PowerupTimerSounds();
+
+	cg.frametime = cg.time - cg.oldTime;
+	if ( cg.frametime < 0 ) {
+		cg.frametime = 0;
+	}
+	cg.oldTime = cg.time;
 }
 
