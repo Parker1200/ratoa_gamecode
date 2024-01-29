@@ -1167,6 +1167,7 @@ typedef struct {
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
 	qhandle_t	ringFlashModel;
+	qhandle_t	plasmaExplosionModel;
 	qhandle_t	dishFlashModel;
 	qhandle_t	lightningExplosionModel;
 
@@ -1781,12 +1782,14 @@ extern vmCvar_t			cg_ratPlasmaTrail;
 extern vmCvar_t			cg_ratPlasmaTrailAlpha;
 extern vmCvar_t			cg_ratPlasmaTrailStep;
 extern vmCvar_t			cg_ratPlasmaTrailTime;
+extern vmCvar_t			cg_ratPlasmaExplosion;
 extern vmCvar_t			cg_rocketStyle;
 extern vmCvar_t			cg_ratRocketTrail;
 extern vmCvar_t			cg_ratRocketTrailAlpha;
 extern vmCvar_t			cg_ratRocketTrailRadius;
 extern vmCvar_t			cg_ratRocketTrailStep;
 extern vmCvar_t			cg_ratRocketTrailTime;
+extern vmCvar_t			cg_ratRocketExplosion;
 extern vmCvar_t			cg_ratRail;
 extern vmCvar_t			cg_ratRailBeefy;
 extern vmCvar_t			cg_ratRailRadius;
@@ -1802,6 +1805,8 @@ extern vmCvar_t			cg_zoomToggle;
 extern vmCvar_t			cg_zoomAnim;
 extern vmCvar_t			cg_zoomAnimScale;
 extern vmCvar_t			cg_sensScaleWithFOV;
+extern vmCvar_t			cg_zoomSensitivity;
+extern vmCvar_t			cg_zoomSensitivityMode;
 extern vmCvar_t			cg_drawHabarBackground;
 extern vmCvar_t			cg_drawHabarDecor;
 extern vmCvar_t			cg_hudDamageIndicator;
