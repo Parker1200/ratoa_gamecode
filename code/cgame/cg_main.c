@@ -361,6 +361,8 @@ vmCvar_t	cg_variedModelColors;
 vmCvar_t	cg_variedModelSaturation;
 vmCvar_t	cg_variedModelValue;
 
+vmCvar_t	cg_simpleMuzzleFlashBFG;
+
 vmCvar_t	cg_itemFade;
 vmCvar_t	cg_itemFadeTime;
 
@@ -849,6 +851,8 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_variedModelColors ,          "cg_variedModelColors", "0", CVAR_ARCHIVE},
 	{ &cg_variedModelSaturation , "cg_variedModelSaturation", "0.8", CVAR_ARCHIVE},
 	{ &cg_variedModelValue , "cg_variedModelValue", "1", CVAR_ARCHIVE},
+
+	{ &cg_simpleMuzzleFlashBFG , "cg_simpleMuzzleFlashBFG", "0", CVAR_ARCHIVE | CVAR_LATCH},
 
 	{ &cg_itemFade ,           "cg_itemFade", "1", CVAR_ARCHIVE},
 	{ &cg_itemFadeTime ,           "cg_itemFadeTime", "3000", CVAR_CHEAT},

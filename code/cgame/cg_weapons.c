@@ -1240,6 +1240,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	int				i;
 	const char *worldmodel = NULL;
 	unsigned int soundIdx;
+	qboolean simpleMuzlleFlash = qfalse;
 
 	weaponInfo = &cg_weapons[weaponNum];
 
@@ -1306,8 +1307,16 @@ void CG_RegisterWeapon( int weaponNum ) {
 			default:
 				break;
 		}
+		if ( cg_simpleMuzzleFlashBFG.integer ) {
+			simpleMuzlleFlash = qtrue;
+		}
 	}
-	strcat( path, "_flash.md3" );
+	if ( simpleMuzlleFlash ) {
+		strcat( path, "_flash_1.md3" );
+	}
+	else {
+		strcat( path, "_flash.md3" );
+	}
 	weaponInfo->flashModel = trap_R_RegisterModel( path );
 
 	Q_strncpyz( path, worldmodel, MAX_QPATH );
