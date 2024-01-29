@@ -1795,6 +1795,7 @@ extern vmCvar_t			cg_ratRailBeefy;
 extern vmCvar_t			cg_ratRailRadius;
 extern vmCvar_t			cg_ratLg;
 extern vmCvar_t			cg_ratLgImpact;
+extern vmCvar_t			cg_bfgStyle;
 extern vmCvar_t			cg_lgSound;
 extern vmCvar_t			cg_rgSound;
 extern vmCvar_t			cg_consoleStyle;

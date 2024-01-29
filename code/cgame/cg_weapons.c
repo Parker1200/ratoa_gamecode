@@ -1293,6 +1293,20 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 	Q_strncpyz( path, worldmodel, MAX_QPATH );
 	COM_StripExtension(path, path, sizeof(path));
+	if ( weaponNum == WP_BFG ) {
+		switch (cg_bfgStyle.integer) {
+			case 2:
+				// red + yellow
+				strcat( path, "_r" );
+				break;
+			case 3:
+				// purple
+				strcat( path, "_p" );
+				break;
+			default:
+				break;
+		}
+	}
 	strcat( path, "_flash.md3" );
 	weaponInfo->flashModel = trap_R_RegisterModel( path );
 
@@ -1526,8 +1540,23 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/bfg/bfg_hum.wav", qfalse );
 		MAKERGB( weaponInfo->flashDlightColor, 1, 0.7f, 1 );
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/bfg/bfg_fire.wav", qfalse );
-		cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosion" );
-		weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg.md3" );
+		switch (cg_bfgStyle.integer) {
+			case 2:
+				// red + yellow
+				cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosionR" );
+				weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg_r.md3" );
+				break;
+			case 3:
+				// purple
+				cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosionP" );
+				weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg_p.md3" );
+				break;
+			case 1:
+			default:
+				cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosion" );
+				weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg.md3" );
+				break;
+		}
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 		break;
 
