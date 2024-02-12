@@ -2393,7 +2393,8 @@ void PmoveSingle (pmove_t *pmove) {
 		// flight powerup doesn't allow jump and has different friction
 		PM_FlyMove();
 	} else if (pm->ps->pm_flags & PMF_GRAPPLE_PULL) {
-		if (pm->pmove_ratflags & RAT_SWINGGRAPPLE) {
+		if ( (!(pm->pmove_ratflags & RAT_AIOGRAPPLE) && pm->pmove_ratflags & RAT_SWINGGRAPPLE) ||
+			(pm->pmove_ratflags & RAT_AIOGRAPPLE && pm->pmove_swingGrapple) ) {
 			PM_SwingGrappleMove();
 		} else {
 			PM_GrappleMove();
@@ -2466,6 +2467,7 @@ void Pmove (pmove_t *pmove) {
 		| (pmove->cmd.forwardmove < 0 ? MOVEMENT_KEY_DOWN : 0)
 		| (pmove->cmd.rightmove > 0 ? MOVEMENT_KEY_RIGHT : 0)
 		| (pmove->cmd.rightmove < 0 ? MOVEMENT_KEY_LEFT : 0)
+		| (pmove->pmove_swingGrapple ? MOVEMENT_KEY_SWINGGRAPPLE : 0)
 	;
 
 	pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount+1) & ((1<<PS_PMOVEFRAMECOUNTBITS)-1);

@@ -187,6 +187,7 @@ vmCvar_t        g_elimination_lockspectator;
 
 vmCvar_t	g_swingGrapple;
 vmCvar_t	g_grapple;
+vmCvar_t	g_aioGrapple;
 
 vmCvar_t	g_rockets;
 
@@ -816,6 +817,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_swingGrapple, "g_swingGrapple", "0", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_grapple, "g_grapple", "0", CVAR_ARCHIVE, 0, qtrue },
+	{ &g_aioGrapple, "g_aioGrapple", "0", CVAR_ARCHIVE, 0, qfalse },
 
 	//nexuiz style rocket arena
 	{ &g_rockets, "g_rockets", "0", CVAR_SERVERINFO | CVAR_LATCH | CVAR_NORESTART, 0, qfalse },
@@ -1642,6 +1644,10 @@ void G_UpdateRatFlags( void ) {
 	// 	rflags |= RAT_CROUCHSLIDE;
 	// }
 
+	if (g_aioGrapple.integer) {
+		rflags |= RAT_AIOGRAPPLE;
+	}
+
 	if (g_rampJump.integer) {
 		rflags |= RAT_RAMPJUMP;
 	}
@@ -1818,6 +1824,7 @@ void G_UpdateCvars( void ) {
 						|| cv->vmCvar == &g_fastSwitch
 						|| cv->vmCvar == &g_fastWeapons
 						// || cv->vmCvar == &g_crouchSlide
+						|| cv->vmCvar == &g_aioGrapple
 						|| cv->vmCvar == &g_rampJump
 						|| cv->vmCvar == &g_allowForcedModels
 						|| cv->vmCvar == &g_friendsWallHack

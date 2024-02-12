@@ -351,6 +351,7 @@ static void CG_Rules_f( void ) {
 	CG_Printf(" -Rocket speed:          %i\n", cgs.rocketSpeed);
 	CG_Printf(" -Shotgun type:          %s\n", cgs.ratFlags & RAT_NEWSHOTGUN ? "rat" : "classic");
 	CG_Printf(" -Grapple type:          %s\n", cgs.ratFlags & RAT_SWINGGRAPPLE ? "swinging" : "classic");
+	CG_Printf(" -All-in-One grapple:    %s\n", CG_OnOffStr(cgs.ratFlags & RAT_AIOGRAPPLE));
 	trap_SendClientCommand("srules");
 }
 
@@ -359,6 +360,9 @@ static void CG_RatVersion_f( void ) {
 	trap_SendClientCommand("ratversion");
 }
 
+static void CG_GrappleModeToggle_f( void ) {
+	trap_Cvar_Set("sg", cg_swingGrappleUserinfo.integer ? "0": "1");
+}
 
 #ifdef MISSIONPACK
 extern menuDef_t *menuScoreboard;
@@ -750,6 +754,7 @@ static consoleCommand_t	commands[] = {
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
+	{ "grapplemode", CG_GrappleModeToggle_f },
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "vtell_target", CG_VoiceTellTarget_f },

@@ -37,6 +37,7 @@ int enemySoundModificationCount = -1;
 int announcerModificationCount = -1;
 int forceColorModificationCounts = -1;
 int ratStatusbarModificationCount = -1;
+int swingGrappleModificationCount = -1;
 int hudMovementKeysModificationCount = -1;
 qboolean hudMovementKeysRegistered = qfalse;
 
@@ -398,6 +399,8 @@ vmCvar_t	cg_drawTeamBackground;
 //unlagged - smooth clients #2
 vmCvar_t	pmove_fixed;
 //vmCvar_t	cg_pmove_fixed;
+vmCvar_t	cg_swingGrappleUserinfo;
+vmCvar_t	cg_swingGrapple;
 vmCvar_t	pmove_msec;
 vmCvar_t        pmove_float;
 vmCvar_t	cg_pmove_msec;
@@ -920,6 +923,8 @@ static cvarTable_t cvarTable[] = { // bk001129
 	{ &cg_trueLightning, "cg_trueLightning", "1.0", CVAR_ARCHIVE},
         { &cg_music, "cg_music", "", CVAR_ARCHIVE},
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
+	{ &cg_swingGrappleUserinfo, "sg", "0", CVAR_ROM | CVAR_USERINFO },
+	{ &cg_swingGrapple, "cg_swingGrapple", "0", CVAR_ARCHIVE },
 
 	{ &cg_fragmsgsize, "cg_fragmsgsize", "0.6", CVAR_ARCHIVE},
 	{ &cg_crosshairPulse, "cg_crosshairPulse", "0", CVAR_ARCHIVE},
@@ -1855,6 +1860,13 @@ void CG_UpdateCvars( void ) {
 		CG_RegisterMovementKeysShaders();
 		hudMovementKeysRegistered = qtrue;
 		hudMovementKeysModificationCount = cg_hudMovementKeys.modificationCount;
+	}
+
+	if ( swingGrappleModificationCount != cg_swingGrapple.modificationCount ) {
+		if ( !(swingGrappleModificationCount == -1 && cg.time > 0) ) {
+			trap_Cvar_Set("sg", cg_swingGrapple.integer ? "1": "0");
+		}
+		swingGrappleModificationCount = cg_swingGrapple.modificationCount;
 	}
 }
 

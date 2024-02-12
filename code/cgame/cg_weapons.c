@@ -2427,6 +2427,13 @@ int CG_FullAmmo(int weapon) {
 }
 
 
+static char *CG_GrappleMode() {
+	if (cgs.ratFlags & RAT_AIOGRAPPLE) {
+		return cg.predictedPlayerState.stats[STAT_MOVEMENT_KEYS] & MOVEMENT_KEY_SWINGGRAPPLE ? "S" : "C";
+	}
+	return "";
+}
+
 /*
 ===============
 CG_DrawWeaponBar0
@@ -2653,6 +2660,14 @@ void CG_DrawWeaponBar2(int count, int bits, float *color){
 				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 				CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
 			}
+			else if ( i == WP_GRAPPLING_HOOK ) {
+				s = CG_GrappleMode();
+				if ( s[0] ) {
+					w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+					CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
+				}
+			}
+
 
 			y -= 24;
                 //Sago: Undo mad change of weapons
@@ -2768,6 +2783,13 @@ void CG_DrawWeaponBar3(int count, int bits, float *color){
 				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 				CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
 			}
+			else if ( i == WP_GRAPPLING_HOOK ) {
+				s = CG_GrappleMode();
+				if ( s[0] ) {
+					w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+					CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
+				}
+			}
 
 			y -= 24;
                         //Sago: Undo mad change of weapons
@@ -2849,6 +2871,13 @@ void CG_DrawWeaponBar4(int count, int bits, float *color){
 				s = va("%i", ammoSaved );
 				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 				CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
+			}
+			else if ( i == WP_GRAPPLING_HOOK ) {
+				s = CG_GrappleMode();
+				if ( s[0] ) {
+					w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+					CG_DrawSmallStringColor(x - w/2 + 32, y+4, s, color);
+				}
 			}
 
 			y -= 24;
@@ -2934,6 +2963,13 @@ void CG_DrawWeaponBar5(int count, int bits, float *color){
 			s = va("%i", ammoSaved );
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+			}
 		}
 			
 		x += 30;
@@ -3049,6 +3085,13 @@ void CG_DrawWeaponBar6(int count, int bits, float *color){
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
 		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+			}
+		}
 			
 		x += 30;
                 //Sago: Undo mad change of weapons
@@ -3128,6 +3171,13 @@ void CG_DrawWeaponBar7(int count, int bits, float *color){
 			s = va("%i", ammoSaved );
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(x - w/2 + 15, y+20, s, color);
+			}
 		}
 		
 		x += 30;
@@ -3238,6 +3288,13 @@ void CG_DrawWeaponBar8(int count, int bits, float *color){
 			s = va("%i", ammoSaved );
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawSmallStringColor(x - w/2 + 15, y+28, s, color);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(x - w/2 + 15, y+28, s, color);
+			}
 		}
 			
 		x += 30;
@@ -3352,6 +3409,13 @@ void CG_DrawWeaponBar9(int count, int bits, float *color){
 			s = va("%i", ammoSaved );
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawSmallStringColor(x+13 - w/2 + 20, y+3, s, color);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(x+13 - w/2 + 20, y+3, s, color);
+			}
 		}
 
 		y -= 20;
@@ -3474,6 +3538,13 @@ void CG_DrawWeaponBar10(int count, int bits, float *color){
 			w = CG_DrawStrlen( s ) * 6;
 			CG_DrawStringExtFloat(x + CG_HeightToWidth(14.0 - (float)(w)/2.0), y+26, s, color, qtrue, qfalse, CG_HeightToWidth(6), 14, 0);
 		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * 6;
+				CG_DrawStringExtFloat(x + CG_HeightToWidth(14.0 - (float)(w)/2.0), y+26, s, color, qtrue, qfalse, CG_HeightToWidth(6), 14, 0);
+			}
+		}
 			
 		x += boxwidth;
                 //Sago: Undo mad change of weapons
@@ -3585,6 +3656,14 @@ void CG_DrawWeaponBar12(int count, int bits, float *color){
 			w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
 			CG_DrawStringExtFloat( x + CG_HeightToWidth(12.0 - (float)w/2.0 + 20.0), y+3, s, color,
 				       	qtrue, qfalse, CG_HeightToWidth(SMALLCHAR_WIDTH), SMALLCHAR_HEIGHT, 0 );
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawStringExtFloat( x + CG_HeightToWidth(12.0 - (float)w/2.0 + 20.0), y+3, s, color,
+							qtrue, qfalse, CG_HeightToWidth(SMALLCHAR_WIDTH), SMALLCHAR_HEIGHT, 0 );
+			}
 		}
 
 		y -= 20;
@@ -3707,6 +3786,13 @@ void CG_DrawWeaponBar13(int count, int bits, float *color){
 			w = CG_HeightToWidth(CG_DrawStrlen( s ) * char_width);
 			CG_DrawStringExtFloat(x + (boxwidth - w)/2.0, y+3+iconheight+2, s, color, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
 		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_HeightToWidth(CG_DrawStrlen( s ) * char_width);
+				CG_DrawStringExtFloat(x + (boxwidth - w)/2.0, y+3+iconheight+2, s, color, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
+			}
+		}
 			
 		x += boxwidth;
                 //Sago: Undo mad change of weapons
@@ -3824,6 +3910,13 @@ void CG_DrawWeaponBar14(int count, int bits, float *color){
 			s = va("%i", ammoSaved );
 			w = CG_HeightToWidth(CG_DrawStrlen( s ) * char_width);
 			CG_DrawStringExtFloat(x + (boxwidth - w)/2.0, y+3+iconheight+2, s, color, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_HeightToWidth(CG_DrawStrlen( s ) * char_width);
+				CG_DrawStringExtFloat(x + (boxwidth - w)/2.0, y+3+iconheight+2, s, color, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
+			}
 		}
 			
 		x += boxwidth;
@@ -3953,6 +4046,14 @@ void CG_DrawWeaponBar15(int count, int bits, float *color){
 				bg[3] = color[3];
 			}
 			CG_DrawStringExtFloat(x - w/2.0, text_y, s, bg, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
+		}
+		else if ( i == WP_GRAPPLING_HOOK ) {
+			s = CG_GrappleMode();
+			if ( s[0] ) {
+				w = CG_HeightToWidth(CG_DrawStrlen( s ) * char_width);
+				memcpy(bg, color, sizeof(bg));
+				CG_DrawStringExtFloat(x - w/2.0, text_y, s, bg, qtrue, qfalse, CG_HeightToWidth(char_width), char_height, 0);
+			}
 		}
 			
 		x += circleDistance;

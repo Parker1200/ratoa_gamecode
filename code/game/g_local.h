@@ -525,6 +525,8 @@ typedef struct {
     int fps_last;
 
     qboolean trackConsent;
+
+	qboolean swingGrapple;
 } clientPersistant_t;
 
 // for twitchrail award
@@ -1650,6 +1652,7 @@ extern  vmCvar_t        g_elimination_lockspectator;
 
 extern vmCvar_t		g_grapple;
 extern vmCvar_t		g_swingGrapple;
+extern vmCvar_t		g_aioGrapple;
 
 extern vmCvar_t		g_rockets;
 

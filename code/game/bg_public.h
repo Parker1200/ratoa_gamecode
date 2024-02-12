@@ -259,6 +259,8 @@ typedef struct {
         // Selects between VQ3, CPM, and RM.
         movement_t              pmove_movement;
 
+	qboolean	pmove_swingGrapple;
+
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
@@ -329,6 +331,7 @@ typedef enum {
 #define MOVEMENT_KEY_RIGHT  8
 #define MOVEMENT_KEY_JUMP   16
 #define MOVEMENT_KEY_CROUCH 32
+#define MOVEMENT_KEY_SWINGGRAPPLE 64 // for All-in-One grappling hook
 
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
@@ -903,6 +906,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define RAT_FASTSWITCH 		(1 << 4)
 #define RAT_FASTWEAPONS 	(1 << 5)
 // #define RAT_CROUCHSLIDE		(1 << 6)
+#define RAT_AIOGRAPPLE	(1 << 6)
 #define RAT_RAMPJUMP 		(1 << 7)
 #define RAT_ALLOWFORCEDMODELS 	(1 << 8)
 #define RAT_FRIENDSWALLHACK 	(1 << 9)

@@ -120,6 +120,7 @@ typedef struct
 #define ID_PINGWARN 40
 #define ID_READY 41
 #define ID_DROP 42
+#define ID_GRAPPLEMODE	43
 
 // all others
 #define ID_FREELOOK	80
@@ -234,6 +235,7 @@ typedef struct
         menuaction_s		voip_talk;
         menuradiobutton_s	voip_teamonly;
 	menuaction_s		ready;
+	menuaction_s		grapple_mode;
 	menuradiobutton_s	joyenable;
 	menuslider_s		joythreshold;
 	int					section;
@@ -312,6 +314,7 @@ static bind_t g_bindings[] =
         {"+pingWarn", 		"warn about location",  ID_PINGWARN,		ANIM_CHAT,		'b',				-1,		-1, -1},
         {"ready", 		"ready",            	ID_READY,		ANIM_IDLE,		K_F3,				-1,		-1, -1},
 	{"drop", 		"drop powerup/weapon",		ID_DROP,	ANIM_IDLE,		'n',			-1,		-1, -1},
+	{"grapplemode", 	"switch grapple mode",	ID_GRAPPLEMODE,	ANIM_IDLE,	'f',			-1,		-1, -1},
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
@@ -395,6 +398,7 @@ static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.ping,
 	(menucommon_s *)&s_controls.ping_warn,
 	(menucommon_s *)&s_controls.ready,
+	(menucommon_s *)&s_controls.grapple_mode,
 	NULL,
 };
 
@@ -1676,6 +1680,12 @@ static void Controls_MenuInit( void )
 	s_controls.ready.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.ready.generic.id        = ID_READY;
 
+	s_controls.grapple_mode.generic.type	  = MTYPE_ACTION;
+	s_controls.grapple_mode.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.grapple_mode.generic.callback  = Controls_ActionEvent;
+	s_controls.grapple_mode.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.grapple_mode.generic.id        = ID_GRAPPLEMODE;
+
 	s_controls.joyenable.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.joyenable.generic.flags	   = QMF_SMALLFONT;
 	s_controls.joyenable.generic.x	       = SCREEN_WIDTH/2;
@@ -1768,6 +1778,7 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.ping );
 	Menu_AddItem( &s_controls.menu, &s_controls.ping_warn );
 	Menu_AddItem( &s_controls.menu, &s_controls.ready );
+	Menu_AddItem( &s_controls.menu, &s_controls.grapple_mode );
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 

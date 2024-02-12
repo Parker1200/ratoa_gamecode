@@ -2124,6 +2124,14 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->pers.trackConsent = qfalse;
 	}
 
+	s = Info_ValueForKey( userinfo, "sg" );
+	if ( !*s || atoi( s ) == 0 ) {
+		client->pers.swingGrapple = qfalse;
+	}
+	else {
+		client->pers.swingGrapple = qtrue;
+	}
+
 	// see if the player is nudging his shots
 	//s = Info_ValueForKey( userinfo, "cg_cmdTimeNudge" );
 	//client->pers.cmdTimeNudge = atoi( s );
