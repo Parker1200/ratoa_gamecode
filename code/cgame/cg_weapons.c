@@ -2422,7 +2422,7 @@ int CG_FullAmmo(int weapon) {
 }
 
 
-static char *CG_GrappleMode() {
+static char *CG_GrappleMode( void ) {
 	if (cgs.ratFlags & RAT_AIOGRAPPLE) {
 		return cg.predictedPlayerState.stats[STAT_MOVEMENT_KEYS] & MOVEMENT_KEY_SWINGGRAPPLE ? "S" : "C";
 	}

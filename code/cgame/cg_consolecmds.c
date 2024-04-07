@@ -364,6 +364,14 @@ static void CG_GrappleModeToggle_f( void ) {
 	trap_Cvar_Set("sg", cg_swingGrappleUserinfo.integer ? "0": "1");
 }
 
+static void CG_GrappleModeClassic_f( void ) {
+	trap_Cvar_Set("sg", "0");
+}
+
+static void CG_GrappleModeSwing_f( void ) {
+	trap_Cvar_Set("sg", "1");
+}
+
 #ifdef MISSIONPACK
 extern menuDef_t *menuScoreboard;
 void Menu_Reset( void );			// FIXME: add to right include file
@@ -755,6 +763,8 @@ static consoleCommand_t	commands[] = {
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
 	{ "grapplemode", CG_GrappleModeToggle_f },
+	{ "gmode_c", CG_GrappleModeClassic_f },
+	{ "gmode_s", CG_GrappleModeSwing_f },
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "vtell_target", CG_VoiceTellTarget_f },
