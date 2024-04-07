@@ -38,7 +38,7 @@ void CG_PrintClientNumbers( void ) {
     for(i=0;i<cg.numScores;i++) {
         CG_Printf("%-4d",cg.scores[i].client);
 
-        CG_Printf(" %-5d",cg.scores[i].score);
+        CG_Printf(" %-5d", (cg.scores[i].team == TEAM_SPECTATOR) ? 0 : cg.scores[i].score);
 
         CG_Printf(" %-4d",cg.scores[i].ping);
 
