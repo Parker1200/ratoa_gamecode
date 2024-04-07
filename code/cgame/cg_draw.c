@@ -401,7 +401,7 @@ void CG_Draw3DHead( float x, float y, float w, float h, qhandle_t model, qhandle
 
 	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE)
 					&& (cg_brightShells.integer || cg_brightOutline.integer)
-					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= 1)))))
+					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && (cg_forceModel.integer <= -1 || cg_variedModelColors.integer))) )))
 			&& ci->team != TEAM_SPECTATOR &&
 			( (cg_teamHeadColorAuto.integer && ci->team == cg.snap->ps.persistant[PERS_TEAM])
 			  || (cg_enemyHeadColorAuto.integer && ci->team != cg.snap->ps.persistant[PERS_TEAM])

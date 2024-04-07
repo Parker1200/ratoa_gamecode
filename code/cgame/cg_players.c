@@ -23,18 +23,52 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
 
-#define MAX_AUTOHEADCOLORS 32 // cannot be greater than 64 (MAX_CLIENTS)
+#define MAX_AUTOHEADCOLORS 32
 static byte head_auto_colors[MAX_AUTOHEADCOLORS][3] = {
 	{ 0xFF, 0x00, 0x00 },
-	// { 0x00, 0x00, 0xFF },
+	{ 0x00, 0x00, 0xFF },
 	{ 0xFF, 0xFF, 0x00 },
 	{ 0x00, 0xFF, 0xFF },
 	{ 0xFF, 0x00, 0xFF },
 	{ 0x7F, 0xFF, 0x00 },
 	{ 0x8B, 0x45, 0x13 },
 	{ 0xFF, 0xF8, 0xDC },
-	// { 0x00, 0x00, 0x00 },
-	{ 0x00, 0xB4, 0xFF }, // replacement
+	{ 0x00, 0x00, 0x00 },
+	{ 0x22, 0x8B, 0x22 },
+	{ 0x69, 0x69, 0x69 },
+	{ 0xFF, 0xA5, 0x00 },
+	{ 0x48, 0x3D, 0x8B },
+	{ 0x1E, 0x90, 0xFF },
+	{ 0x8A, 0x2B, 0xE2 },
+	{ 0x80, 0x80, 0x00 },
+	{ 0xD8, 0xBF, 0xD8 },
+	{ 0x00, 0x8B, 0x8B },
+	{ 0xDC, 0x14, 0x3C },
+	{ 0x00, 0x00, 0x80 },
+	{ 0x9A, 0xCD, 0x32 },
+	{ 0x46, 0x82, 0xB4 },
+	{ 0x8F, 0xBC, 0x8F },
+	{ 0x80, 0x00, 0x80 },
+	{ 0x00, 0xFF, 0x7F },
+	{ 0xFF, 0x7F, 0x50 },
+	{ 0xDB, 0x70, 0x93 },
+	{ 0xF0, 0xE6, 0x8C },
+	{ 0x90, 0xEE, 0x90 },
+	{ 0xFF, 0x14, 0x93 },
+	{ 0x7B, 0x68, 0xEE },
+	{ 0xEE, 0x82, 0xEE }
+};
+
+#define MAX_VARIEDMODELCOLORS 32 // cannot be greater than 64 (MAX_CLIENTS)
+static byte varied_model_colors_raw[MAX_VARIEDMODELCOLORS][3] = {
+	{ 0xFF, 0x00, 0x00 },
+	{ 0xFF, 0xFF, 0x00 },
+	{ 0x00, 0xFF, 0xFF },
+	{ 0xFF, 0x00, 0xFF },
+	{ 0x00, 0xFF, 0x22 },
+	{ 0xFF, 0x4D, 0x00 },
+	{ 0x4D, 0x10, 0xFF },
+	{ 0x00, 0xB4, 0xFF },
 	{ 0x22, 0x8B, 0x22 },
 	{ 0x69, 0x69, 0x69 },
 	{ 0xFF, 0xA5, 0x00 },
@@ -58,9 +92,8 @@ static byte head_auto_colors[MAX_AUTOHEADCOLORS][3] = {
 	{ 0xFF, 0x14, 0x93 },
 	{ 0x7B, 0x68, 0xEE },
 	{ 0xEE, 0x82, 0xEE },
-	{ 0x00, 0x00, 0xFF } // formerly second color
+	{ 0x00, 0x00, 0xFF }
 };
-
 static float varied_model_colors[MAX_CLIENTS][4];
 
 char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
@@ -1071,7 +1104,7 @@ void CG_NewClientInfo( int clientNum ) {
 	CG_ColorFromString( v, newInfo.color2 );
 
 	v = Info_ValueForKey( configstring, "pc" );
-	newInfo.playerColorIndex = abs(atoi( v )) % MAX_AUTOHEADCOLORS;
+	newInfo.playerColorIndex = atoi( v );
 	
 
 	// bot skill
@@ -3018,9 +3051,9 @@ CG_VariedModelAutoColor
 static void CG_VariedModelAutoColor(int idx) {
 	float h,s,v;
 
-	varied_model_colors[idx][0] = head_auto_colors[idx][0];
-	varied_model_colors[idx][1] = head_auto_colors[idx][1];
-	varied_model_colors[idx][2] = head_auto_colors[idx][2];
+	varied_model_colors[idx][0] = varied_model_colors_raw[idx][0];
+	varied_model_colors[idx][1] = varied_model_colors_raw[idx][1];
+	varied_model_colors[idx][2] = varied_model_colors_raw[idx][2];
 
 	Q_RGB2HSV(varied_model_colors[idx], &h, &s, &v);
 	Q_HSV2RGB(h, cg_variedModelSaturation.value, cg_variedModelValue.value, varied_model_colors[idx]);
@@ -3064,7 +3097,7 @@ void CG_PlayerGetColors(clientInfo_t *ci, qboolean isDead, int bodyPart, byte *o
 		else {
 			if ( cg_variedModelColors.integer || cg_forceModel.integer <= -1 ) {
 				float color[4];
-				idx = (cg_variedModelColors.integer == 2) ? ci->playerColorIndex : clientNum;
+				idx = (cg_variedModelColors.integer == 2) ? (abs(ci->playerColorIndex) % MAX_VARIEDMODELCOLORS) : clientNum;
 				color[0] = varied_model_colors[idx][0];
 				color[1] = varied_model_colors[idx][1];
 				color[2] = varied_model_colors[idx][2];
@@ -3291,7 +3324,7 @@ void CG_ParseForcedColors( void ) {
 	}
 
 	if ( cg_variedModelColors.integer == 2 ) {
-		for ( i = 0; i < MAX_AUTOHEADCOLORS; i++ ) {
+		for ( i = 0; i < MAX_VARIEDMODELCOLORS; i++ ) {
 			CG_VariedModelAutoColor( i );
 		}
 	}
@@ -3309,7 +3342,7 @@ void CG_ParseForcedColors( void ) {
 
 
 void CG_PlayerAutoHeadColor(clientInfo_t *ci, byte *outColor) {
-	int idx = ci->playerColorIndex;
+	int idx = abs(ci->playerColorIndex) % MAX_AUTOHEADCOLORS;
 	outColor[0] = head_auto_colors[idx][0];
 	outColor[1] = head_auto_colors[idx][1];
 	outColor[2] = head_auto_colors[idx][2];
@@ -3414,7 +3447,7 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerGetColors(ci, useDeadColors, MCIDX_LEGS, legs.shaderRGBA, clientNum);
 	if ((ci->forcedBrightModel || (cgs.ratFlags & (RAT_BRIGHTSHELL | RAT_BRIGHTOUTLINE) 
 					&& (cg_brightShells.integer || cg_brightOutline.integer) 
-					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && cg_forceModel.integer <= -1)))))
+					&& (cgs.gametype != GT_FFA || (cgs.ratFlags & RAT_ALLOWFORCEDMODELS && !(cgs.gametype == GT_FFA && (cg_forceModel.integer <= -1 || cg_variedModelColors.integer))) )))
 			&& ci->team != TEAM_SPECTATOR &&
 			( (cg_teamHeadColorAuto.integer && ci->team == cg.snap->ps.persistant[PERS_TEAM])
 			  || (cg_enemyHeadColorAuto.integer && ci->team != cg.snap->ps.persistant[PERS_TEAM])
