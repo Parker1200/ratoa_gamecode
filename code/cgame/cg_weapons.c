@@ -1311,12 +1311,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 			simpleMuzlleFlash = qtrue;
 		}
 	}
-	if ( simpleMuzlleFlash ) {
-		strcat( path, "_flash_1.md3" );
-	}
-	else {
-		strcat( path, "_flash.md3" );
-	}
+	strcat( path, simpleMuzlleFlash ? "_flash_1.md3" : "_flash.md3" );
 	weaponInfo->flashModel = trap_R_RegisterModel( path );
 
 	Q_strncpyz( path, worldmodel, MAX_QPATH );
