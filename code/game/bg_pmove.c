@@ -935,6 +935,7 @@ static void PM_GrappleMove( void ) {
 
 #define GRAPPLE_PULLSPEED 350
 #define GRAPPLE_ACCEL 1500
+#define GRAPPLE_LEAVING_GROUND_SPEED 1.0f
 static void PM_SwingGrappleMove( void ) {
 	vec3_t vel, v;
 	vec3_t grappleTargetVel;
@@ -957,7 +958,12 @@ static void PM_SwingGrappleMove( void ) {
 		VectorAdd(grappleTargetVel, pm->ps->velocity, pm->ps->velocity);
 	}
 
-	pml.groundPlane = qfalse;
+	// Stick to the ground just a teeny bit so that we can still jump while grappling. This is to satisfy PM_WalkMove's
+	// jump condition.
+	if (pm->ps->velocity[2] > GRAPPLE_LEAVING_GROUND_SPEED) {
+		pml.groundPlane = qfalse;
+		pml.walking = qfalse;
+	}
 }
 
 /*
@@ -2396,11 +2402,17 @@ void PmoveSingle (pmove_t *pmove) {
 		if ( (!(pm->pmove_ratflags & RAT_AIOGRAPPLE) && pm->pmove_ratflags & RAT_SWINGGRAPPLE) ||
 			(pm->pmove_ratflags & RAT_AIOGRAPPLE && pm->pmove_swingGrapple) ) {
 			PM_SwingGrappleMove();
+			// PM_WalkMove, so we can jump.
+			if (pml.groundPlane) {
+				PM_WalkMove();
+			} else {
+				PM_AirMove();
+			}
 		} else {
 			PM_GrappleMove();
+			// We can wiggle a bit
+			PM_AirMove();
 		}
-		// We can wiggle a bit
-		PM_AirMove();
 	} else if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
 	} else if ( pm->waterlevel > 1 ) {
