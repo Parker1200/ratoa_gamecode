@@ -162,8 +162,11 @@ static void VoteNextMapMenu_LevelshotDraw( void *self ) {
 
 	if( !b->shader ) {
 		b->shader = trap_R_RegisterShaderNoMip( va("levelshots/%s", nextmapvote_maplist.mapname[n]));
-		if( !b->shader && b->errorpic ) {
-			b->shader = trap_R_RegisterShaderNoMip( b->errorpic );
+		if( !b->shader ) {
+			b->shader = trap_R_RegisterShaderNoMip( va("levelthumbs/%s", nextmapvote_maplist.mapname[n]) );
+		}
+		if( !b->shader ) {
+			b->shader = trap_R_RegisterShaderNoMip( ART_UNKNOWNMAP );
 		}
 	}
 
@@ -259,7 +262,7 @@ void UI_VoteNextMapMenu( void ) {
     	s_votemenu_nextmap.mappics[i].width  		= 128;
     	s_votemenu_nextmap.mappics[i].height  	    = 96;
     	s_votemenu_nextmap.mappics[i].focuspic       = ART_SELECTED;
-    	s_votemenu_nextmap.mappics[i].errorpic       = ART_UNKNOWNMAP;
+    	// s_votemenu_nextmap.mappics[i].errorpic       = ART_UNKNOWNMAP;
     	s_votemenu_nextmap.mappics[i].generic.ownerdraw = VoteNextMapMenu_LevelshotDraw;
     
     	s_votemenu_nextmap.mapbuttons[i].generic.type     = MTYPE_BITMAP;

@@ -386,6 +386,9 @@ static void VoteMapMenu_LevelshotDraw( void *self ) {
 		if( !b->shader && b->errorpic ) {
 			b->shader = trap_R_RegisterShaderNoMip( b->errorpic );
 		}
+		if( !b->shader ) {
+			b->shader = trap_R_RegisterShaderNoMip( ART_UNKNOWNMAP );
+		}
 	}
 
 	if( b->focuspic && !b->focusshader ) {
@@ -437,6 +440,7 @@ void UI_VoteMapMenu_Update( void ) {
 	int				i;
 	int 		top;
 	static	char	picname[MAX_MAPSPERPAGE][64];
+	static	char	fallbackpic[MAX_MAPSPERPAGE][64];
 	char			mapname[MAX_MAPNAME_LENGTH];
 	char			picnameold[64];
 
@@ -449,8 +453,10 @@ void UI_VoteMapMenu_Update( void ) {
 			break;
 
 		if ( s_votemenu_map.mappics[i].generic.name ) {
-			// Q_strncpyz( picnameold, s_votemenu_map.mappics[i].generic.name, sizeof(picnameold) );
-			Com_sprintf( picnameold, sizeof(picnameold), s_votemenu_map.mappics[i].generic.name );
+			Q_strncpyz( picnameold, s_votemenu_map.mappics[i].generic.name, sizeof(picnameold) );
+		}
+		else {
+			picnameold[0] = '\0';
 		}
 
 		Q_strncpyz( mapname, filtered_list.mapname[top+i], MAX_MAPNAME_LENGTH );
@@ -459,9 +465,11 @@ void UI_VoteMapMenu_Update( void ) {
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", mapname );
                 
 		s_votemenu_map.mappics[i].generic.flags &= ~((unsigned int)QMF_HIGHLIGHT);
-		if ( !s_votemenu_map.mappics[i].generic.name || Q_stricmp( picname[i], picnameold ) ) {
+		if ( !s_votemenu_map.mappics[i].generic.name || !s_votemenu_map.mappics[i].errorpic || Q_stricmp( picname[i], picnameold ) ) {
+			Com_sprintf( fallbackpic[i], sizeof(fallbackpic[i]), "levelthumbs/%s", mapname );
 			s_votemenu_map.mappics[i].generic.name   = picname[i];
 			s_votemenu_map.mappics[i].shader         = 0;
+			s_votemenu_map.mappics[i].errorpic       = fallbackpic[i];
 		}
 
 		// reset
@@ -754,7 +762,7 @@ void UI_VoteMapMenu( void ) {
     	s_votemenu_map.mappics[i].width  		= 128;
     	s_votemenu_map.mappics[i].height  	    = 96;
     	s_votemenu_map.mappics[i].focuspic       = ART_SELECTED;
-    	s_votemenu_map.mappics[i].errorpic       = ART_UNKNOWNMAP;
+    	// s_votemenu_map.mappics[i].errorpic       = ART_UNKNOWNMAP;
     	s_votemenu_map.mappics[i].generic.ownerdraw = VoteMapMenu_LevelshotDraw;
     
     	s_votemenu_map.mapbuttons[i].generic.type     = MTYPE_BITMAP;
